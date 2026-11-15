@@ -17,13 +17,13 @@
 			</p>
 			<div class="mt-7 flex flex-wrap items-center gap-3">
 				<a
-					href="#products"
+					href="/shop"
 					class="inline-flex items-center gap-2 rounded-lg bg-olive px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-olive-dark"
 				>
 					Shop Now <Icon name="arrow-right" class="h-4 w-4" />
 				</a>
 				<a
-					href="#deals"
+					href="/deals"
 					class="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:border-olive hover:text-olive"
 				>
 					Explore Deals

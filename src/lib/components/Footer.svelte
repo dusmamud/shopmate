@@ -14,7 +14,7 @@
 <footer id="footer" class="border-t border-line bg-cream">
 	<div class="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
 		<div>
-			<a href="#home" class="flex items-center gap-2">
+			<a href="/" class="flex items-center gap-2">
 				<span class="flex h-9 w-9 items-center justify-center rounded-xl bg-olive text-white">
 					<Icon name="bag" class="h-5 w-5" />
 				</span>
@@ -31,20 +31,21 @@
 		<nav aria-label="Quick links">
 			<h3 class="text-sm font-bold tracking-wide text-ink">Quick Links</h3>
 			<ul class="mt-4 space-y-2.5 text-sm text-stone-500">
-				<li><a class="hover:text-olive" href="#home">Home</a></li>
-				<li><a class="hover:text-olive" href="#products">Shop</a></li>
-				<li><a class="hover:text-olive" href="#categories">Categories</a></li>
-				<li><a class="hover:text-olive" href="#deals">Deals</a></li>
+				<li><a class="hover:text-olive" href="/">Home</a></li>
+				<li><a class="hover:text-olive" href="/shop">Shop</a></li>
+				<li><a class="hover:text-olive" href="/categories">Categories</a></li>
+				<li><a class="hover:text-olive" href="/deals">Deals</a></li>
+				<li><a class="hover:text-olive" href="/track-order">Track Order</a></li>
 			</ul>
 		</nav>
 
 		<nav aria-label="Customer service">
 			<h3 class="text-sm font-bold tracking-wide text-ink">Customer Service</h3>
 			<ul class="mt-4 space-y-2.5 text-sm text-stone-500">
-				<li><a class="hover:text-olive" href="#footer">Track Order</a></li>
-				<li><a class="hover:text-olive" href="#footer">Returns &amp; Refunds</a></li>
-				<li><a class="hover:text-olive" href="#footer">Shipping Policy</a></li>
-				<li><a class="hover:text-olive" href="#footer">Help Center</a></li>
+				<li><a class="hover:text-olive" href="/track-order">Track Order</a></li>
+				<li><a class="hover:text-olive" href="/help">Returns &amp; Refunds</a></li>
+				<li><a class="hover:text-olive" href="/help">Shipping Policy</a></li>
+				<li><a class="hover:text-olive" href="/help">Help Center</a></li>
 			</ul>
 		</nav>
 

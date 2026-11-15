@@ -1,0 +1,222 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import Icon from '#lib/components/Icon.svelte';
+	import { getProduct } from '../../lib/data/products';
+	import { shop, formatPrice, FREE_SHIPPING_OVER } from '../../lib/data/store.svelte';
+
+	let promoInput = $state('');
+	let promoError = $state('');
+
+	const lines = $derived(
+		shop.cart
+			.map((c) => ({ ...c, product: getProduct(c.id) }))
+			.filter((l) => l.product !== undefined)
+	);
+
+	const remaining = $derived(
+		Math.max(0, FREE_SHIPPING_OVER - (shop.cartSubtotal - shop.cartDiscount))
+	);
+	const shipProgress = $derived(
+		Math.min(100, ((shop.cartSubtotal - shop.cartDiscount) / FREE_SHIPPING_OVER) * 100)
+	);
+
+	function applyPromo() {
+		promoError = '';
+		if (!promoInput.trim()) return;
+		if (!shop.applyPromo(promoInput)) {
+			promoError = 'That promo code is not valid. Try WELCOME10 or FREESHIP.';
+		} else {
+			promoInput = '';
+		}
+	}
+</script>
+
+<svelte:head>
+	<title>Your Cart — ShopMate</title>
+</svelte:head>
+
+<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+	<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
+		Your Cart {#if shop.cartCount > 0}<span class="text-base font-semibold text-stone-500">({shop.cartCount} {shop.cartCount === 1 ? 'item' : 'items'})</span>{/if}
+	</h1>
+
+	{#if shop.cart.length === 0}
+		<div class="mt-8 rounded-2xl border border-dashed border-line bg-cream px-6 py-16 text-center">
+			<Icon name="bag" class="mx-auto h-12 w-12 text-stone-300" />
+			<p class="mt-4 text-lg font-bold text-ink">Your cart is empty</p>
+			<p class="mt-1 text-sm text-stone-500">Browse our best sellers and add something you love.</p>
+			<a
+				href="/shop"
+				class="mt-6 inline-flex items-center gap-2 rounded-lg bg-olive px-6 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark"
+			>
+				Shop Now <Icon name="arrow-right" class="h-4 w-4" />
+			</a>
+		</div>
+	{:else}
+		<div class="mt-6 grid gap-6 lg:grid-cols-3">
+			<div class="lg:col-span-2">
+				<ul class="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+					{#each lines as line (line.id)}
+						{@const p = line.product!}
+						<li class="flex gap-4 p-4 sm:p-5">
+							<a href="/product/{p.id}" class="block h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#f6f1e7] sm:h-24 sm:w-24">
+								<img src={p.src} alt={p.name} class="h-full w-full object-cover" />
+							</a>
+							<div class="min-w-0 flex-1">
+								<div class="flex items-start justify-between gap-3">
+									<h2 class="text-sm font-semibold text-ink sm:text-base">
+										<a href="/product/{p.id}" class="hover:text-olive">{p.name}</a>
+									</h2>
+									<button
+										type="button"
+										onclick={() => shop.removeFromCart(p.id)}
+										aria-label="Remove {p.name} from cart"
+										class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-stone-400 transition hover:bg-red-50 hover:text-red-500"
+									>
+										<Icon name="trash" class="h-4 w-4" />
+									</button>
+								</div>
+								<p class="mt-0.5 text-xs text-stone-500">{formatPrice(p.price)} each</p>
+								<div class="mt-3 flex items-center justify-between gap-3">
+									<div class="flex items-center rounded-lg border border-line">
+										<button
+											type="button"
+											onclick={() => shop.updateQty(p.id, line.qty - 1)}
+											aria-label="Decrease quantity of {p.name}"
+											class="flex h-9 w-9 items-center justify-center text-ink transition hover:text-olive"
+										>
+											<Icon name="minus" class="h-4 w-4" />
+										</button>
+										<span class="w-8 text-center text-sm font-bold text-ink" aria-live="polite">{line.qty}</span>
+										<button
+											type="button"
+											onclick={() => shop.updateQty(p.id, line.qty + 1)}
+											aria-label="Increase quantity of {p.name}"
+											class="flex h-9 w-9 items-center justify-center text-ink transition hover:text-olive"
+										>
+											<Icon name="plus" class="h-4 w-4" />
+										</button>
+									</div>
+									<p class="text-sm font-extrabold text-ink sm:text-base">
+										{formatPrice(p.price * line.qty)}
+									</p>
+								</div>
+							</div>
+						</li>
+					{/each}
+				</ul>
+
+				<a href="/shop" class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-olive hover:text-olive-dark">
+					<Icon name="chevron-left" class="h-4 w-4" /> Continue Shopping
+				</a>
+			</div>
+
+			<aside class="lg:col-span-1">
+				<div class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] lg:sticky lg:top-24">
+					<h2 class="text-base font-bold text-ink">Order Summary</h2>
+
+					<!-- Free shipping progress -->
+					<div class="mt-4 rounded-xl bg-cream p-3">
+						{#if remaining > 0}
+							<p class="flex items-center gap-2 text-xs font-medium text-stone-600">
+								<Icon name="truck" class="h-4 w-4 text-olive" />
+								Add {formatPrice(remaining)} more for free shipping
+							</p>
+						{:else}
+							<p class="flex items-center gap-2 text-xs font-semibold text-olive">
+								<Icon name="check-circle" class="h-4 w-4" />
+								You have unlocked free shipping!
+							</p>
+						{/if}
+						<div class="mt-2 h-2 overflow-hidden rounded-full bg-stone-200">
+							<div class="h-full rounded-full bg-olive transition-all" style="width: {shipProgress}%"></div>
+						</div>
+					</div>
+
+					<!-- Promo code -->
+					{#if shop.promoCode}
+						<div class="mt-4 flex items-center justify-between rounded-lg border border-olive/30 bg-olive-soft px-3 py-2.5">
+							<span class="flex items-center gap-2 text-sm font-semibold text-olive">
+								<Icon name="tag" class="h-4 w-4" /> {shop.promoCode} applied
+							</span>
+							<button
+								type="button"
+								onclick={() => shop.clearPromo()}
+								class="flex items-center gap-1 text-xs font-medium text-stone-500 hover:text-red-500"
+							>
+								<Icon name="close" class="h-3.5 w-3.5" /> Remove
+							</button>
+						</div>
+					{:else}
+						<form
+							class="mt-4"
+							onsubmit={(e) => {
+								e.preventDefault();
+								applyPromo();
+							}}
+						>
+							<label for="promo" class="text-xs font-semibold text-stone-500">Promo code</label>
+							<div class="mt-1.5 flex gap-2">
+								<input
+									id="promo"
+									type="text"
+									bind:value={promoInput}
+									placeholder="WELCOME10"
+									autocomplete="off"
+									class="min-w-0 flex-1 rounded-lg border border-line px-3 py-2.5 text-sm uppercase placeholder:normal-case focus:border-olive focus:ring-2 focus:ring-olive/30 focus:outline-none"
+								/>
+								<button
+									type="submit"
+									class="shrink-0 rounded-lg border border-olive px-4 py-2.5 text-sm font-semibold text-olive transition hover:bg-olive-soft"
+								>
+									Apply
+								</button>
+							</div>
+							{#if promoError}
+								<p class="mt-1.5 flex items-center gap-1.5 text-xs text-red-600">
+									<Icon name="alert" class="h-3.5 w-3.5" /> {promoError}
+								</p>
+							{:else}
+								<p class="mt-1.5 text-xs text-stone-400">Try WELCOME10 for 10% off or FREESHIP.</p>
+							{/if}
+						</form>
+					{/if}
+
+					<dl class="mt-5 space-y-2.5 border-t border-line pt-4 text-sm">
+						<div class="flex justify-between">
+							<dt class="text-stone-500">Subtotal</dt>
+							<dd class="font-semibold text-ink">{formatPrice(shop.cartSubtotal)}</dd>
+						</div>
+						{#if shop.cartDiscount > 0}
+							<div class="flex justify-between">
+								<dt class="text-stone-500">Discount</dt>
+								<dd class="font-semibold text-green-700">−{formatPrice(shop.cartDiscount)}</dd>
+							</div>
+						{/if}
+						<div class="flex justify-between">
+							<dt class="text-stone-500">Shipping</dt>
+							<dd class="font-semibold text-ink">
+								{shop.cartShipping === 0 ? 'FREE' : formatPrice(shop.cartShipping)}
+							</dd>
+						</div>
+						<div class="flex justify-between border-t border-line pt-3 text-base">
+							<dt class="font-bold text-ink">Total</dt>
+							<dd class="font-extrabold text-ink">{formatPrice(shop.cartTotal)}</dd>
+						</div>
+					</dl>
+
+					<button
+						type="button"
+						onclick={() => goto('/checkout')}
+						class="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark"
+					>
+						Proceed to Checkout <Icon name="arrow-right" class="h-4 w-4" />
+					</button>
+					<p class="mt-3 flex items-center justify-center gap-1.5 text-xs text-stone-400">
+						<Icon name="shield" class="h-3.5 w-3.5" /> Secure checkout · 30-day returns
+					</p>
+				</div>
+			</aside>
+		</div>
+	{/if}
+</div>

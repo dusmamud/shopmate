@@ -25,3 +25,14 @@ All visuals are AI-generated product photography in `static/` — no stock photo
 - `avatar-hero-1..4.webp`, `avatar-john.webp`, `avatar-sarah.webp`, `avatar-michael.webp` — real customer headshots
 
 Icons are real SVGs in `src/lib/components/Icon.svelte` (no emoji).
+
+## Shop functionality (all local, no backend)
+
+Full storefront flow, stored in the browser's localStorage:
+
+- **Pages:** Home, Shop (search + category filter + sort), Product detail (`/product/[id]`), Categories, Deals (countdown + discount badges), Cart, Checkout, Order Success, My Orders, Track Order, Login, Sign Up, My Account, Wishlist, Contact, Help (shipping / returns / FAQ)
+- **Cart & wishlist:** add to cart with quantity (capped at stock), promo codes `WELCOME10` (10% off) and `FREESHIP` (free shipping), free shipping over $50, wishlist with counts in the header
+- **Checkout:** one-page, guest checkout by default (best practice — no forced account), COD / Card / UPI (demo), order summary with full cost before payment
+- **Orders:** order IDs like `SMXXXXXXXX`, status timeline (Placed → Processing → Shipped → Out for delivery → Delivered, advancing ~daily), reorder from My Orders
+- **Auth:** local demo accounts (passwords hashed, never stored plain) — accounts and orders live only on the device
+- **Verification:** Playwright end-to-end test passed 11/11 (signup → login → add to cart → wishlist → promo → checkout logged-in + guest → track order); zero horizontal overflow on 6 key pages at 390px

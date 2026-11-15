@@ -12,7 +12,7 @@
 				Limited time offer on selected items. Hurry up and grab the best deals!
 			</p>
 			<a
-				href="#products"
+				href="/deals"
 				class="mt-6 inline-flex items-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark"
 			>
 				Shop the Sale <Icon name="arrow-right" class="h-4 w-4" />

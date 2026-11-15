@@ -14,7 +14,7 @@
 	);
 
 	function addToCart(id: number) {
-		shop.addToCart();
+		shop.addToCart(id);
 		added.add(id);
 		added = new Set(added);
 		setTimeout(() => {
@@ -29,7 +29,7 @@
 		<h2 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
 			{shop.search.trim() ? `Results for “${shop.search.trim()}”` : 'Best Selling Products'}
 		</h2>
-		<a href="#products" class="flex shrink-0 items-center gap-1.5 text-sm font-medium text-olive hover:text-olive-dark">
+		<a href="/shop" class="flex shrink-0 items-center gap-1.5 text-sm font-medium text-olive hover:text-olive-dark">
 			View All Products <Icon name="arrow-right" class="h-4 w-4" />
 		</a>
 	</div>
