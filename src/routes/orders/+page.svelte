@@ -5,6 +5,8 @@
 
 	const myOrders = $derived(shop.myOrders());
 
+	let confirmCancelId = $state<string | null>(null);
+
 	function reorder(order: Order) {
 		for (const item of order.items)
 			shop.addToCart(item.id, item.qty, { variant: item.variant, silent: true });
@@ -64,8 +66,8 @@
 							<span class="text-stone-500">{formatDate(order.placedAt)}</span>
 							<span class="text-stone-500">{order.items.length} {order.items.length === 1 ? 'item' : 'items'}</span>
 						</div>
-						<span class="rounded-full bg-olive-soft px-3 py-1 text-xs font-bold text-olive">
-							{ORDER_STEPS[step]}
+						<span class="rounded-full px-3 py-1 text-xs font-bold {order.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-olive-soft text-olive'}">
+							{order.status === 'cancelled' ? 'Cancelled' : ORDER_STEPS[step]}
 						</span>
 					</div>
 					<div class="px-5 py-4">
@@ -86,12 +88,12 @@
 						</div>
 						<div class="mt-4">
 							<div class="h-2 overflow-hidden rounded-full bg-stone-200">
-								<div class="h-full rounded-full bg-olive transition-all" style="width: {progress(order)}%"></div>
+								<div class="h-full rounded-full {order.status === 'cancelled' ? 'bg-red-400' : 'bg-olive'} transition-all" style="width: {order.status === 'cancelled' ? 100 : progress(order)}%"></div>
 							</div>
 							<div class="mt-1.5 flex justify-between text-[11px] font-medium text-stone-400">
-								<span class={step >= 0 ? 'text-olive' : ''}>Placed</span>
-								<span class={step >= 2 ? 'text-olive' : ''}>Shipped</span>
-								<span class={step >= 4 ? 'text-olive' : ''}>Delivered</span>
+								<span class={step >= 0 && order.status !== 'cancelled' ? 'text-olive' : ''}>Placed</span>
+								<span class={step >= 2 && order.status !== 'cancelled' ? 'text-olive' : ''}>Shipped</span>
+								<span class={step >= 4 && order.status !== 'cancelled' ? 'text-olive' : ''}>Delivered</span>
 							</div>
 						</div>
 						<div class="mt-4 flex flex-wrap gap-2">
@@ -108,6 +110,35 @@
 							>
 								<Icon name="cart" class="h-4 w-4" /> Reorder
 							</button>
+							{#if shop.isCancellable(order)}
+								{#if confirmCancelId === order.id}
+									<button
+										type="button"
+										onclick={() => {
+											shop.cancelOrder(order.id);
+											confirmCancelId = null;
+										}}
+										class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+									>
+										Confirm cancel?
+									</button>
+									<button
+										type="button"
+										onclick={() => (confirmCancelId = null)}
+										class="inline-flex items-center gap-1.5 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-olive"
+									>
+										Keep order
+									</button>
+								{:else}
+									<button
+										type="button"
+										onclick={() => (confirmCancelId = order.id)}
+										class="inline-flex items-center gap-1.5 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:border-red-400"
+									>
+										Cancel Order
+									</button>
+								{/if}
+							{/if}
 						</div>
 					</div>
 				</article>

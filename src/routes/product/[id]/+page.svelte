@@ -33,6 +33,75 @@
 
 	let askQuestion = $state('');
 	let extraQuestions = $state<{ q: string }[]>([]);
+	let sizeGuideOpen = $state(false);
+	let reviewFilter = $state(0); // 0 = all ratings, else 1–5 stars
+	let helpfulVoted = $state<Set<string>>(new Set());
+	let fbtSelected = $state<Set<number>>(new Set());
+
+	const jsonLd = $derived(
+		product
+			? JSON.stringify({
+					'@context': 'https://schema.org',
+					'@type': 'Product',
+					name: product.name,
+					image: 'https://shopmates.pages.dev' + product.src,
+					description: product.desc,
+					brand: { '@type': 'Brand', name: 'ShopMate' },
+					aggregateRating: {
+						'@type': 'AggregateRating',
+						ratingValue: product.rating,
+						reviewCount: product.reviews
+					},
+					offers: {
+						'@type': 'Offer',
+						priceCurrency: 'USD',
+						price: product.price,
+						availability: 'https://schema.org/InStock'
+					}
+				})
+			: ''
+	);
+
+	/** Size chart for products sold by size (shoes, apparel). */
+	const sizeGuide = $derived.by(() => {
+		if (!product) return null;
+		if (product.id === 4)
+			return {
+				title: 'Running Shoes — UK size guide',
+				note: 'Measure your foot in the evening and match the length below. Between sizes? Go half a size up.',
+				cols: ['UK', 'EU', 'Foot length'],
+				rows: [
+					['6', '40', '25.0 cm'],
+					['7', '41', '25.7 cm'],
+					['8', '42', '26.4 cm'],
+					['9', '43', '27.1 cm'],
+					['10', '44', '27.8 cm']
+				]
+			};
+		if (product.id === 6)
+			return {
+				title: 'Classic Cotton T-Shirt — size guide',
+				note: 'Chest measured flat across, armpit to armpit. Regular fit — size up for a relaxed look.',
+				cols: ['Size', 'Chest', 'Length'],
+				rows: [
+					['S', '38"', '27"'],
+					['M', '40"', '28"'],
+					['L', '42"', '29"'],
+					['XL', '44"', '30"']
+				]
+			};
+		return null;
+	});
+
+	/** Frequently bought together: this product + top 2 related. */
+	const fbtItems = $derived(product ? relatedProducts(product.id, 2) : []);
+	const fbtTotal = $derived(
+		product
+			? product.price +
+				fbtItems.filter((p) => fbtSelected.has(p.id)).reduce((n, p) => n + p.price, 0)
+			: 0
+	);
+	const fbtCount = $derived(1 + fbtItems.filter((p) => fbtSelected.has(p.id)).length);
 
 	const savePct = $derived(
 		product ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0
@@ -40,7 +109,8 @@
 	const images = $derived(product?.images ?? []);
 	const allReviews = $derived(product ? shop.getReviews(product.id) : []);
 	const sortedReviews = $derived.by(() => {
-		const list = [...allReviews];
+		let list = [...allReviews];
+		if (reviewFilter > 0) list = list.filter((r) => r.rating === reviewFilter);
 		if (reviewSort === 'highest') list.sort((a, b) => b.rating - a.rating);
 		if (reviewSort === 'lowest') list.sort((a, b) => a.rating - b.rating);
 		return list;
@@ -65,6 +135,8 @@
 		activeImg = 0;
 		tab = 'description';
 		reviewSort = 'newest';
+		reviewFilter = 0;
+		fbtSelected = new Set(relatedProducts(p.id, 2).map((x) => x.id));
 	});
 
 	// Lightbox: ESC / arrows + scroll lock while open.
@@ -91,7 +163,64 @@
 			shop.trackView(product.id);
 			reviewName = shop.user?.name ?? '';
 		}
+		try {
+			helpfulVoted = new Set(
+				JSON.parse(localStorage.getItem('shopmate_helpful') ?? '[]') as string[]
+			);
+		} catch {
+			helpfulVoted = new Set();
+		}
 	});
+
+	// Size guide modal: ESC + scroll lock while open.
+	$effect(() => {
+		if (!sizeGuideOpen) return;
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') sizeGuideOpen = false;
+		};
+		window.addEventListener('keydown', onKey);
+		const prev = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+		return () => {
+			window.removeEventListener('keydown', onKey);
+			document.body.style.overflow = prev;
+		};
+	});
+
+	function helpfulKey(r: Review) {
+		return `${product?.id ?? 0}:${r.name}:${r.title}`;
+	}
+
+	function helpfulCount(r: Review) {
+		return (r.helpful ?? 0) + (helpfulVoted.has(helpfulKey(r)) ? 1 : 0);
+	}
+
+	function toggleHelpful(r: Review) {
+		const key = helpfulKey(r);
+		if (helpfulVoted.has(key)) helpfulVoted.delete(key);
+		else helpfulVoted.add(key);
+		helpfulVoted = new Set(helpfulVoted);
+		try {
+			localStorage.setItem('shopmate_helpful', JSON.stringify([...helpfulVoted]));
+		} catch {
+			// Storage unavailable — the in-memory vote still shows.
+		}
+	}
+
+	function toggleFbt(id: number) {
+		if (fbtSelected.has(id)) fbtSelected.delete(id);
+		else fbtSelected.add(id);
+		fbtSelected = new Set(fbtSelected);
+	}
+
+	function addFbt() {
+		if (!product) return;
+		shop.addToCart(product.id, 1, { variant: selectedVariant, silent: true });
+		for (const item of fbtItems) {
+			if (fbtSelected.has(item.id)) shop.addToCart(item.id, 1, { silent: true });
+		}
+		shop.openCart();
+	}
 
 	function stepQty(delta: number) {
 		if (!product) return;
@@ -165,6 +294,15 @@
 
 <svelte:head>
 	<title>{product ? `${product.name} — ShopMate` : 'Product not found — ShopMate'}</title>
+	{#if product}
+		<meta name="description" content={product.desc} />
+		<meta property="og:title" content="{product.name} — ShopMate" />
+		<meta property="og:description" content={product.desc} />
+		<meta property="og:image" content={'https://shopmates.pages.dev' + product.src} />
+		<meta property="og:type" content="product" />
+		<meta name="twitter:card" content="summary_large_image" />
+		{@html `<script type="application/ld+json">${jsonLd}</script>`}
+	{/if}
 </svelte:head>
 
 {#if !product}
@@ -295,10 +433,21 @@
 
 				<!-- Variant selector (buttons, not a dropdown) -->
 				<div class="mt-6">
-					<p class="text-sm font-semibold text-ink">
-						{product.option.label}:
-						<span class="font-normal text-stone-600">{selectedVariant}</span>
-					</p>
+					<div class="flex items-center justify-between gap-3">
+						<p class="text-sm font-semibold text-ink">
+							{product.option.label}:
+							<span class="font-normal text-stone-600">{selectedVariant}</span>
+						</p>
+						{#if sizeGuide}
+							<button
+								type="button"
+								onclick={() => (sizeGuideOpen = true)}
+								class="text-xs font-semibold text-olive underline underline-offset-2"
+							>
+								Size guide
+							</button>
+						{/if}
+					</div>
 					<div class="mt-2.5 flex flex-wrap gap-2" role="group" aria-label={product.option.label}>
 						{#each product.option.choices as choice (choice)}
 							<button
@@ -329,6 +478,11 @@
 						<span class="h-2.5 w-2.5 rounded-full bg-red-500"></span>
 						<span class="text-red-600">Out of stock</span>
 					{/if}
+				</p>
+
+				<p class="mt-2 text-xs text-stone-500">
+					Sold &amp; shipped by <span class="font-semibold text-ink">ShopMate</span> · Free returns
+					within 30 days
 				</p>
 
 				<div class="mt-5 flex flex-wrap items-center gap-3">
@@ -457,6 +611,59 @@
 			</div>
 		</div>
 
+		<!-- Frequently bought together -->
+		{#if fbtItems.length > 0}
+			<section class="mt-12 rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-6">
+				<h2 class="text-lg font-extrabold tracking-tight text-ink">Frequently Bought Together</h2>
+				<div class="mt-4 flex flex-wrap items-center gap-3">
+					<a href="/product/{product.id}" class="block h-20 w-20 overflow-hidden rounded-xl bg-[#f6f1e7]">
+						<img src={product.src} alt={product.name} class="h-full w-full object-cover" />
+					</a>
+					{#each fbtItems as item (item.id)}
+						<span class="text-xl font-bold text-stone-300" aria-hidden="true">+</span>
+						<a href="/product/{item.id}" class="block h-20 w-20 overflow-hidden rounded-xl bg-[#f6f1e7]">
+							<img src={item.src} alt={item.name} class="h-full w-full object-cover" />
+						</a>
+					{/each}
+				</div>
+				<ul class="mt-4 space-y-2.5 text-sm">
+					<li class="flex items-center gap-2.5">
+						<Icon name="check-circle" class="h-5 w-5 shrink-0 text-olive" />
+						<span class="font-semibold text-ink">{product.name}</span>
+						<span class="ml-auto font-bold text-ink">{formatPrice(product.price)}</span>
+					</li>
+					{#each fbtItems as item (item.id)}
+						<li class="flex items-center gap-2.5">
+							<input
+								type="checkbox"
+								id="fbt-{item.id}"
+								checked={fbtSelected.has(item.id)}
+								onchange={() => toggleFbt(item.id)}
+								class="h-5 w-5 shrink-0 accent-[#5c7038]"
+							/>
+							<label for="fbt-{item.id}" class="min-w-0 flex-1 cursor-pointer">
+								<span class="font-semibold text-ink hover:text-olive">{item.name}</span>
+							</label>
+							<span class="font-bold text-ink">{formatPrice(item.price)}</span>
+						</li>
+					{/each}
+				</ul>
+				<div class="mt-4 flex flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:items-center sm:justify-between">
+					<p class="text-sm text-stone-600">
+						Total for <span class="font-bold text-ink">{fbtCount} item{fbtCount === 1 ? '' : 's'}</span>:
+						<span class="text-base font-extrabold text-ink">{formatPrice(fbtTotal)}</span>
+					</p>
+					<button
+						type="button"
+						onclick={addFbt}
+						class="flex items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark"
+					>
+						<Icon name="cart" class="h-4 w-4" /> Add {fbtCount} item{fbtCount === 1 ? '' : 's'} to Cart
+					</button>
+				</div>
+			</section>
+		{/if}
+
 		<!-- Tabs: Description / Specifications / Reviews / Q&A -->
 		<section class="mt-12">
 			<div class="flex gap-1 overflow-x-auto border-b border-line" role="tablist" aria-label="Product information">
@@ -547,6 +754,26 @@
 								</select>
 							</label>
 						</div>
+						<div class="mt-3 flex flex-wrap gap-2" role="group" aria-label="Filter reviews by rating">
+							{#each [0, 5, 4, 3, 2, 1] as star (star)}
+								<button
+									type="button"
+									onclick={() => (reviewFilter = star)}
+									aria-pressed={reviewFilter === star}
+									class="min-h-9 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition {reviewFilter ===
+									star
+										? 'border-olive bg-olive text-white'
+										: 'border-line bg-white text-ink hover:border-olive'}"
+								>
+									{star === 0 ? 'All ratings' : `${star}★`}
+								</button>
+							{/each}
+						</div>
+						{#if sortedReviews.length === 0}
+							<p class="mt-6 rounded-xl bg-cream px-4 py-6 text-center text-sm text-stone-500">
+								No {reviewFilter}★ reviews yet — try another rating or be the first to write one below.
+							</p>
+						{/if}
 						<ul class="mt-4 divide-y divide-line">
 							{#each sortedReviews as r (r.name + r.title)}
 								<li class="py-4">
@@ -556,6 +783,17 @@
 									</p>
 									<p class="mt-1.5 text-sm leading-relaxed text-stone-600">{r.text}</p>
 									<p class="mt-1.5 text-xs text-stone-400">{r.name} · {r.date}</p>
+									<button
+										type="button"
+										onclick={() => toggleHelpful(r)}
+										aria-pressed={helpfulVoted.has(helpfulKey(r))}
+										class="mt-2.5 flex min-h-9 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition {helpfulVoted.has(helpfulKey(r))
+											? 'border-olive bg-olive-soft text-olive'
+											: 'border-line bg-white text-stone-500 hover:border-olive hover:text-olive'}"
+									>
+										<Icon name="check" class="h-3.5 w-3.5" />
+										Helpful ({helpfulCount(r)})
+									</button>
 								</li>
 							{/each}
 						</ul>
@@ -792,6 +1030,53 @@
 			<Icon name="cart" class="h-4 w-4" /> Add to Cart
 		</button>
 	</div>
+
+	<!-- Size guide modal -->
+	{#if sizeGuideOpen && sizeGuide}
+		<div class="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label={sizeGuide.title}>
+			<button
+				type="button"
+				aria-label="Close size guide"
+				onclick={() => (sizeGuideOpen = false)}
+				class="absolute inset-0 cursor-default bg-black/60"
+			></button>
+			<div class="relative w-full max-w-lg rounded-t-2xl bg-white p-5 shadow-2xl sm:rounded-2xl sm:p-6">
+				<div class="flex items-start justify-between gap-3">
+					<h2 class="text-lg font-extrabold text-ink">{sizeGuide.title}</h2>
+					<button
+						type="button"
+						onclick={() => (sizeGuideOpen = false)}
+						aria-label="Close"
+						class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink transition hover:bg-cream"
+					>
+						<Icon name="close" class="h-5 w-5" />
+					</button>
+				</div>
+				<p class="mt-2 text-sm text-stone-600">{sizeGuide.note}</p>
+				<table class="mt-4 w-full text-sm">
+					<thead>
+						<tr class="border-b border-line text-left">
+							{#each sizeGuide.cols as col (col)}
+								<th scope="col" class="px-3 py-2.5 font-bold text-ink first:pl-0">{col}</th>
+							{/each}
+						</tr>
+					</thead>
+					<tbody>
+						{#each sizeGuide.rows as row, i (row[0])}
+							<tr class={i % 2 === 0 ? 'bg-cream/60' : 'bg-white'}>
+								{#each row as cell, j (j)}
+									<td class="px-3 py-2.5 text-stone-600 first:pl-3 first:font-semibold first:text-ink">{cell}</td>
+								{/each}
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+				<p class="mt-4 text-xs text-stone-400">
+					Still unsure? Free 30-day returns — if the fit is wrong, send it back.
+				</p>
+			</div>
+		</div>
+	{/if}
 
 	<!-- Image lightbox -->
 	{#if lightbox}

@@ -7,6 +7,7 @@
 
 	let searchId = $state('');
 	let submitted = $state(false);
+	let confirmCancel = $state(false);
 
 	// The order ID comes from ?id=, which is only readable in the browser
 	// (searchParams is unavailable while prerendering on the server).
@@ -94,11 +95,19 @@
 						Placed {formatDate(found.placedAt)} · {found.payment}
 					</p>
 				</div>
-				<span class="rounded-full bg-olive-soft px-3 py-1 text-xs font-bold text-olive">
-					{ORDER_STEPS[step]}
+				<span class="rounded-full px-3 py-1 text-xs font-bold {found.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-olive-soft text-olive'}">
+					{found.status === 'cancelled' ? 'Cancelled' : ORDER_STEPS[step]}
 				</span>
 			</div>
 
+			{#if found.status === 'cancelled'}
+				<div class="border-b border-line bg-red-50 px-5 py-4">
+					<p class="flex items-start gap-2 text-sm text-red-700">
+						<Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
+						<span>This order was cancelled. No payment was taken for it — this is a demo store, so nothing was charged.</span>
+					</p>
+				</div>
+			{:else}
 			<div class="px-5 py-5">
 				<p class="flex items-center gap-2 text-sm text-stone-600">
 					<Icon name="truck" class="h-4 w-4 text-olive" />
@@ -144,6 +153,44 @@
 					{/each}
 				</ol>
 			</div>
+
+			{#if shop.isCancellable(found)}
+				<div class="border-t border-line px-5 py-4">
+					{#if confirmCancel}
+						<div class="flex flex-wrap gap-2">
+							<button
+								type="button"
+								onclick={() => {
+									shop.cancelOrder(found.id);
+									confirmCancel = false;
+								}}
+								class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+							>
+								Yes, cancel this order
+							</button>
+							<button
+								type="button"
+								onclick={() => (confirmCancel = false)}
+								class="rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-olive"
+							>
+								Keep order
+							</button>
+						</div>
+					{:else}
+						<button
+							type="button"
+							onclick={() => (confirmCancel = true)}
+							class="rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:border-red-400"
+						>
+							Cancel Order
+						</button>
+					{/if}
+					<p class="mt-2 text-xs text-stone-400">
+						You can cancel while the order is Placed or Processing. Once it ships, use the 30-day returns process instead.
+					</p>
+				</div>
+			{/if}
+			{/if}
 
 			<div class="border-t border-line px-5 py-4">
 				<h2 class="text-sm font-bold text-ink">Items in this order</h2>

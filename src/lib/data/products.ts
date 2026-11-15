@@ -4,6 +4,8 @@ export type Review = {
 	date: string;
 	title: string;
 	text: string;
+	/** Demo seed count of "helpful" votes for this review. */
+	helpful?: number;
 };
 
 export type QA = { q: string; a: string };
@@ -61,6 +63,7 @@ export const products: Product[] = [
 			{
 				name: 'Rohan K.',
 				rating: 5,
+				helpful: 12,
 				date: 'Nov 2, 2026',
 				title: 'Excellent value for money',
 				text: 'Battery easily lasts a full week and the display is bright even in sunlight. Sleep tracking is surprisingly accurate.'
@@ -68,6 +71,7 @@ export const products: Product[] = [
 			{
 				name: 'Priya S.',
 				rating: 4,
+				helpful: 5,
 				date: 'Oct 18, 2026',
 				title: 'Great watch, app could be better',
 				text: 'The watch itself is fantastic for the price. The companion app takes a little getting used to, but everything works.'
@@ -114,6 +118,7 @@ export const products: Product[] = [
 			{
 				name: 'Aarav M.',
 				rating: 5,
+				helpful: 8,
 				date: 'Nov 8, 2026',
 				title: 'Best headphones under $60',
 				text: 'ANC works really well on flights and the sound is warm with good bass. Very comfortable for long sessions.'
@@ -121,6 +126,7 @@ export const products: Product[] = [
 			{
 				name: 'Neha T.',
 				rating: 4,
+				helpful: 3,
 				date: 'Oct 27, 2026',
 				title: 'Sound is great, mic is average',
 				text: 'Music and movies sound excellent. Call quality indoors is fine, a bit thin outdoors in wind.'
@@ -167,6 +173,7 @@ export const products: Product[] = [
 			{
 				name: 'Vikram R.',
 				rating: 5,
+				helpful: 14,
 				date: 'Nov 5, 2026',
 				title: 'Survived a monsoon trek',
 				text: 'Used it daily for two months including a rainy trek — everything inside stayed dry. Zippers feel premium.'
@@ -174,6 +181,7 @@ export const products: Product[] = [
 			{
 				name: 'Sara L.',
 				rating: 5,
+				helpful: 6,
 				date: 'Oct 12, 2026',
 				title: 'Perfect cabin bag',
 				text: 'Fits under the seat, laptop sleeve is well padded, and the hidden pocket is great for a passport.'
@@ -220,6 +228,7 @@ export const products: Product[] = [
 			{
 				name: 'Kabir D.',
 				rating: 5,
+				helpful: 9,
 				date: 'Nov 1, 2026',
 				title: 'Super comfortable for daily runs',
 				text: 'I run 5 km most mornings — great cushioning, no blisters, and they stay cool. True to size.'
@@ -227,6 +236,7 @@ export const products: Product[] = [
 			{
 				name: 'Anita J.',
 				rating: 4,
+				helpful: 4,
 				date: 'Oct 20, 2026',
 				title: 'Light and comfy',
 				text: 'Very light on the feet and the mesh breathes well. The white color gets dirty fast, so keep that in mind.'
@@ -273,6 +283,7 @@ export const products: Product[] = [
 			{
 				name: 'Meera K.',
 				rating: 5,
+				helpful: 11,
 				date: 'Nov 10, 2026',
 				title: 'Smells far more expensive than it is',
 				text: 'Warm, elegant and long-lasting — I get compliments every time I wear it. The bottle looks lovely on the shelf too.'
@@ -280,6 +291,7 @@ export const products: Product[] = [
 			{
 				name: 'Dev P.',
 				rating: 5,
+				helpful: 7,
 				date: 'Oct 30, 2026',
 				title: 'Bought it as a gift, kept one for myself',
 				text: 'Beautiful packaging, perfect for gifting. The scent is fresh at first and settles into something warm.'
@@ -325,6 +337,7 @@ export const products: Product[] = [
 			{
 				name: 'Imran S.',
 				rating: 5,
+				helpful: 10,
 				date: 'Nov 6, 2026',
 				title: 'My go-to basic tee',
 				text: 'Thick enough to feel premium, soft from the first wash. Ordered three more in other colors.'
@@ -332,6 +345,7 @@ export const products: Product[] = [
 			{
 				name: 'Tara W.',
 				rating: 4,
+				helpful: 2,
 				date: 'Oct 22, 2026',
 				title: 'Good quality, size up if you like it loose',
 				text: 'Fabric quality is great for the price. The fit is regular — size up for a relaxed look.'
@@ -378,6 +392,7 @@ export const products: Product[] = [
 			{
 				name: 'Nina F.',
 				rating: 5,
+				helpful: 13,
 				date: 'Nov 3, 2026',
 				title: 'Looks beautiful on my bedside table',
 				text: 'Warm, soft light and the ceramic base feels really premium. The three brightness levels are handy at night.'
@@ -385,6 +400,7 @@ export const products: Product[] = [
 			{
 				name: 'Arjun B.',
 				rating: 4,
+				helpful: 5,
 				date: 'Oct 15, 2026',
 				title: 'Great lamp, shade could be sturdier',
 				text: 'Lovely glow and solid base. The linen shade is a little delicate, so handle it gently when fitting the bulb.'

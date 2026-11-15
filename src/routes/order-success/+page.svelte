@@ -88,6 +88,12 @@
 					<dt class="text-stone-500">Shipping</dt>
 					<dd class="font-semibold text-ink">{order.shipping === 0 ? 'FREE' : formatPrice(order.shipping)}</dd>
 				</div>
+				{#if order.giftWrap}
+					<div class="flex justify-between">
+						<dt class="text-stone-500">Gift wrap</dt>
+						<dd class="font-semibold text-ink">{formatPrice(2.99)}</dd>
+					</div>
+				{/if}
 				<div class="flex justify-between border-t border-line pt-2 text-base">
 					<dt class="font-bold text-ink">Total paid</dt>
 					<dd class="font-extrabold text-ink">{formatPrice(order.total)}</dd>
@@ -105,6 +111,16 @@
 				{#if order.address.phone}{order.address.phone}<br />{/if}
 				{order.address.email}
 			</address>
+			{#if order.notes}
+				<p class="mt-3 rounded-lg bg-cream px-3.5 py-2.5 text-sm text-stone-600">
+					<span class="font-semibold text-ink">Delivery instructions:</span> {order.notes}
+				</p>
+			{/if}
+			{#if order.giftWrap}
+				<p class="mt-2 flex items-center gap-1.5 text-sm text-stone-600">
+					<Icon name="check-circle" class="h-4 w-4 text-olive" /> Gift wrap added — prices hidden from the packing slip.
+				</p>
+			{/if}
 		</div>
 
 		<div class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">

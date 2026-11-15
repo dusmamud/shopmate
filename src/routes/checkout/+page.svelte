@@ -4,7 +4,7 @@
 	import Icon from '#lib/components/Icon.svelte';
 	import CheckoutSteps from '#lib/components/CheckoutSteps.svelte';
 	import { getProduct } from '../../lib/data/products';
-	import { shop, formatPrice, type Address } from '../../lib/data/store.svelte';
+	import { shop, formatPrice, GIFT_WRAP_FEE, type Address, type SavedAddress } from '../../lib/data/store.svelte';
 
 	type PaymentMethod = 'cod' | 'card' | 'upi';
 
@@ -22,6 +22,18 @@
 	let cardCvc = $state('');
 	let upiId = $state('');
 
+	// Delivery extras
+	let notes = $state('');
+	let giftWrap = $state(false);
+	let promoInput = $state('');
+	let promoError = $state('');
+
+	// Saved addresses (logged-in users)
+	let selectedAddressId = $state<string | null>(null);
+	let saveAddress = $state(false);
+
+	const orderTotal = $derived(shop.cartTotal + (giftWrap ? GIFT_WRAP_FEE : 0));
+
 	let errors = $state<Record<string, string>>({});
 	let placing = $state(false);
 
@@ -33,7 +45,29 @@
 
 	onMount(() => {
 		if (shop.cart.length === 0) goto('/cart');
+		const def = shop.user ? shop.defaultAddress : undefined;
+		if (def) {
+			selectedAddressId = def.id;
+			applyAddress(def);
+		}
 	});
+
+	function applyAddress(a: SavedAddress) {
+		name = a.name;
+		email = a.email;
+		phone = a.phone;
+		address = a.address;
+		city = a.city;
+		stateName = a.state;
+		zip = a.zip;
+	}
+
+	function pickAddress(id: string | null) {
+		selectedAddressId = id;
+		if (!id) return;
+		const found = shop.addresses.find((a) => a.id === id);
+		if (found) applyAddress(found);
+	}
 
 	function formatCardNumber(value: string) {
 		const digits = value.replace(/\D/g, '').slice(0, 16);
@@ -99,9 +133,28 @@
 				: payment === 'card'
 					? 'Card (•••• ' + cardNumber.replace(/\D/g, '').slice(-4) + ')'
 					: 'UPI (' + upiId.trim() + ')';
-		const order = shop.placeOrder(addr, label);
-		if (order) goto('/order-success?id=' + order.id);
-		else goto('/cart');
+		const order = shop.placeOrder(addr, label, { notes, giftWrap });
+		if (order) {
+			if (shop.user && saveAddress) {
+				const exists = shop.addresses.some(
+					(a) => a.address.trim().toLowerCase() === addr.address.toLowerCase() && a.zip === addr.zip
+				);
+				if (!exists) {
+					shop.addAddress({ ...addr, label: addr.city || 'My address' });
+				}
+			}
+			goto('/order-success?id=' + order.id);
+		} else goto('/cart');
+	}
+
+	function applyPromo() {
+		promoError = '';
+		if (!promoInput.trim()) return;
+		if (!shop.applyPromo(promoInput)) {
+			promoError = 'That promo code is not valid. Try WELCOME10 or FREESHIP.';
+		} else {
+			promoInput = '';
+		}
 	}
 
 	const inputCls =
@@ -110,6 +163,7 @@
 
 <svelte:head>
 	<title>Checkout — ShopMate</title>
+	<meta name="description" content="Secure checkout at ShopMate — cash on delivery, card and UPI accepted. Free shipping over $50." />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -140,6 +194,45 @@
 							<a href="/login?redirect=/checkout" class="font-semibold text-olive hover:text-olive-dark">Log in</a>
 							for faster checkout.
 						</p>
+					{/if}
+					{#if shop.user && shop.addresses.length > 0}
+						<div class="mt-4">
+							<p class="text-xs font-semibold text-stone-500">Deliver to a saved address</p>
+							<div class="mt-2 grid gap-2 sm:grid-cols-2">
+								{#each shop.addresses as saved (saved.id)}
+									<button
+										type="button"
+										onclick={() => pickAddress(saved.id)}
+										aria-pressed={selectedAddressId === saved.id}
+										class="rounded-xl border p-3.5 text-left transition {selectedAddressId === saved.id
+											? 'border-olive bg-olive-soft/50'
+											: 'border-line hover:border-olive/50'}"
+									>
+										<span class="flex items-center gap-2 text-sm font-semibold text-ink">
+											<Icon name="pin" class="h-4 w-4 text-olive" /> {saved.label}
+											{#if saved.isDefault}
+												<span class="rounded-full bg-olive px-2 py-0.5 text-[10px] font-bold text-white">Default</span>
+											{/if}
+										</span>
+										<span class="mt-1 block text-xs leading-relaxed text-stone-500">
+											{saved.name} · {saved.address}, {saved.city}, {saved.state} {saved.zip}
+										</span>
+									</button>
+								{/each}
+								<button
+									type="button"
+									onclick={() => pickAddress(null)}
+									aria-pressed={selectedAddressId === null}
+									class="rounded-xl border border-dashed p-3.5 text-left transition {selectedAddressId ===
+									null
+										? 'border-olive bg-olive-soft/50'
+										: 'border-line hover:border-olive/50'}"
+								>
+									<span class="text-sm font-semibold text-ink">Use a different address</span>
+									<span class="mt-1 block text-xs text-stone-500">Fill in the form below.</span>
+								</button>
+							</div>
+						</div>
 					{/if}
 					<div class="mt-4 grid gap-4 sm:grid-cols-2">
 						<div data-error={!!errors.name}>
@@ -178,6 +271,12 @@
 							{#if errors.state}<p class="mt-1 text-xs text-red-600">{errors.state}</p>{/if}
 						</div>
 					</div>
+					{#if shop.user}
+						<label class="mt-4 flex cursor-pointer items-center gap-2.5 text-sm text-stone-600">
+							<input type="checkbox" bind:checked={saveAddress} class="h-4 w-4 accent-[#5c7038]" />
+							Save this address to my account for next time
+						</label>
+					{/if}
 				</section>
 
 				<!-- 2. Payment -->
@@ -273,6 +372,32 @@
 					</div>
 				</section>
 
+				<!-- 3. Delivery & gifting -->
+				<section class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-6">
+					<h2 class="flex items-center gap-2.5 text-base font-bold text-ink">
+						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-olive text-xs font-bold text-white">3</span>
+						Delivery &amp; Gifting
+					</h2>
+					<div class="mt-4">
+						<label for="notes" class="text-xs font-semibold text-stone-500">Delivery instructions <span class="font-normal text-stone-400">(optional)</span></label>
+						<textarea
+							id="notes"
+							bind:value={notes}
+							rows="2"
+							maxlength="200"
+							placeholder="e.g. Leave the parcel with the security guard"
+							class="{inputCls} mt-1.5 resize-y"
+						></textarea>
+					</div>
+					<label class="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-line p-4 transition hover:border-olive/50">
+						<input type="checkbox" bind:checked={giftWrap} class="mt-0.5 h-4 w-4 accent-[#5c7038]" />
+						<span>
+							<span class="block text-sm font-semibold text-ink">Add gift wrap — {formatPrice(GIFT_WRAP_FEE)}</span>
+							<span class="mt-0.5 block text-xs text-stone-500">Wrapped in kraft paper with a ribbon and a blank gift note. Prices are hidden from the packing slip.</span>
+						</span>
+					</label>
+				</section>
+
 				<div class="flex flex-wrap items-center gap-4 rounded-2xl border border-line bg-cream px-5 py-4 text-xs font-medium text-stone-600 sm:gap-6">
 					<span class="flex items-center gap-1.5"><Icon name="shield" class="h-4 w-4 text-olive" /> Secure checkout</span>
 					<span class="flex items-center gap-1.5"><Icon name="truck" class="h-4 w-4 text-olive" /> Fast delivery</span>
@@ -285,7 +410,7 @@
 				<div class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] lg:sticky lg:top-24">
 					<h2 class="text-base font-bold text-ink">Order Summary</h2>
 					<ul class="mt-4 space-y-3">
-						{#each lines as line (line.id)}
+						{#each lines as line (line.id + '-' + (line.variant ?? ''))}
 							{@const p = line.product!}
 							<li class="flex items-center gap-3">
 								<span class="relative block h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-[#f6f1e7]">
@@ -294,12 +419,57 @@
 								</span>
 								<span class="min-w-0 flex-1">
 									<span class="block truncate text-sm font-semibold text-ink">{p.name}</span>
-									<span class="text-xs text-stone-500">{formatPrice(p.price)} × {line.qty}</span>
+									<span class="text-xs text-stone-500">{formatPrice(p.price)} × {line.qty}{#if line.variant} · {p.option.label}: {line.variant}{/if}</span>
 								</span>
 								<span class="text-sm font-semibold text-ink">{formatPrice(p.price * line.qty)}</span>
 							</li>
 						{/each}
 					</ul>
+
+					<!-- Promo code at checkout -->
+					{#if shop.promoCode}
+						<div class="mt-4 flex items-center justify-between rounded-lg border border-olive/30 bg-olive-soft px-3 py-2.5">
+							<span class="flex items-center gap-2 text-sm font-semibold text-olive">
+								<Icon name="tag" class="h-4 w-4" /> {shop.promoCode} applied
+							</span>
+							<button
+								type="button"
+								onclick={() => shop.clearPromo()}
+								class="flex items-center gap-1 text-xs font-medium text-stone-500 hover:text-red-500"
+							>
+								<Icon name="close" class="h-3.5 w-3.5" /> Remove
+							</button>
+						</div>
+					{:else}
+						<div class="mt-4">
+							<label for="checkout-promo" class="text-xs font-semibold text-stone-500">Promo code</label>
+							<div class="mt-1.5 flex gap-2">
+								<input
+									id="checkout-promo"
+									type="text"
+									bind:value={promoInput}
+									placeholder="WELCOME10"
+									autocomplete="off"
+									class="min-w-0 flex-1 rounded-lg border border-line px-3 py-2.5 text-sm uppercase placeholder:normal-case focus:border-olive focus:ring-2 focus:ring-olive/30 focus:outline-none"
+								/>
+								<button
+									type="button"
+									onclick={applyPromo}
+									class="shrink-0 rounded-lg border border-olive px-4 py-2.5 text-sm font-semibold text-olive transition hover:bg-olive-soft"
+								>
+									Apply
+								</button>
+							</div>
+							{#if promoError}
+								<p class="mt-1.5 flex items-center gap-1.5 text-xs text-red-600">
+									<Icon name="alert" class="h-3.5 w-3.5" /> {promoError}
+								</p>
+							{:else}
+								<p class="mt-1.5 text-xs text-stone-400">Try WELCOME10 for 10% off or FREESHIP.</p>
+							{/if}
+						</div>
+					{/if}
+
 					<dl class="mt-5 space-y-2.5 border-t border-line pt-4 text-sm">
 						<div class="flex justify-between">
 							<dt class="text-stone-500">Subtotal</dt>
@@ -315,9 +485,15 @@
 							<dt class="text-stone-500">Shipping</dt>
 							<dd class="font-semibold text-ink">{shop.cartShipping === 0 ? 'FREE' : formatPrice(shop.cartShipping)}</dd>
 						</div>
+						{#if giftWrap}
+							<div class="flex justify-between">
+								<dt class="text-stone-500">Gift wrap</dt>
+								<dd class="font-semibold text-ink">{formatPrice(GIFT_WRAP_FEE)}</dd>
+							</div>
+						{/if}
 						<div class="flex justify-between border-t border-line pt-3 text-base">
 							<dt class="font-bold text-ink">Total</dt>
-							<dd class="font-extrabold text-ink">{formatPrice(shop.cartTotal)}</dd>
+							<dd class="font-extrabold text-ink">{formatPrice(orderTotal)}</dd>
 						</div>
 					</dl>
 					<button
@@ -326,10 +502,13 @@
 						class="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-olive-dark disabled:opacity-60"
 					>
 						<Icon name="lock" class="h-4 w-4" />
-						{placing ? 'Placing Order…' : `Place Order · ${formatPrice(shop.cartTotal)}`}
+						{placing ? 'Placing Order…' : `Place Order · ${formatPrice(orderTotal)}`}
 					</button>
 					<p class="mt-3 text-center text-xs text-stone-400">
-						By placing this order you agree to our Terms and Privacy Policy.
+						By placing this order you agree to our
+						<a href="/terms" class="font-medium text-olive hover:underline">Terms</a>
+						and
+						<a href="/privacy-policy" class="font-medium text-olive hover:underline">Privacy Policy</a>.
 					</p>
 				</div>
 			</aside>

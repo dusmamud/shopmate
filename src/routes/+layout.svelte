@@ -7,23 +7,24 @@
 	import CartDrawer from '#lib/components/CartDrawer.svelte';
 	import QuickView from '#lib/components/QuickView.svelte';
 	import BottomNav from '#lib/components/BottomNav.svelte';
+	import CookieBanner from '#lib/components/CookieBanner.svelte';
 
 	let { children }: LayoutProps = $props();
+
+	const orgJsonLd = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'Organization',
+		name: 'ShopMate',
+		url: 'https://shopmates.pages.dev/',
+		sameAs: []
+	});
 </script>
 
 <svelte:head>
 	<title>ShopMate — Discover The Best Products for You</title>
-	<meta
-		name="description"
-		content="ShopMate — your one-stop shop for quality products at the best prices. Free shipping over $50, secure payment, easy 30-day returns."
-	/>
-	<meta property="og:title" content="ShopMate — Discover The Best Products for You" />
-	<meta
-		property="og:description"
-		content="Explore our wide range of high-quality products at affordable prices. Shop now and enjoy the best deals!"
-	/>
 	<meta property="og:type" content="website" />
 	<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+	{@html `<script type="application/ld+json">${orgJsonLd}</script>`}
 </svelte:head>
 
 <Header />
@@ -34,4 +35,5 @@
 <CartDrawer />
 <QuickView />
 <BottomNav />
+<CookieBanner />
 <Toast />

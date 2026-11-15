@@ -35,6 +35,8 @@
 				<li><a class="hover:text-olive" href="/shop">Shop</a></li>
 				<li><a class="hover:text-olive" href="/categories">Categories</a></li>
 				<li><a class="hover:text-olive" href="/deals">Deals</a></li>
+				<li><a class="hover:text-olive" href="/about">About Us</a></li>
+				<li><a class="hover:text-olive" href="/blog">Blog</a></li>
 				<li><a class="hover:text-olive" href="/track-order">Track Order</a></li>
 			</ul>
 		</nav>
@@ -43,8 +45,10 @@
 			<h3 class="text-sm font-bold tracking-wide text-ink">Customer Service</h3>
 			<ul class="mt-4 space-y-2.5 text-sm text-stone-500">
 				<li><a class="hover:text-olive" href="/track-order">Track Order</a></li>
-				<li><a class="hover:text-olive" href="/help">Returns &amp; Refunds</a></li>
-				<li><a class="hover:text-olive" href="/help">Shipping Policy</a></li>
+				<li><a class="hover:text-olive" href="/returns-policy">Returns &amp; Refunds</a></li>
+				<li><a class="hover:text-olive" href="/shipping-policy">Shipping Policy</a></li>
+				<li><a class="hover:text-olive" href="/privacy-policy">Privacy Policy</a></li>
+				<li><a class="hover:text-olive" href="/terms">Terms of Service</a></li>
 				<li><a class="hover:text-olive" href="/help">Help Center</a></li>
 			</ul>
 		</nav>

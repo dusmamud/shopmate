@@ -29,10 +29,25 @@
 	function toggle(i: number) {
 		openIndex = openIndex === i ? null : i;
 	}
+
+	const faqJsonLd = JSON.stringify({
+		'@context': 'https://schema.org',
+		'@type': 'FAQPage',
+		mainEntity: faqs.map((faq) => ({
+			'@type': 'Question',
+			name: faq.q,
+			acceptedAnswer: { '@type': 'Answer', text: faq.a }
+		}))
+	});
 </script>
 
 <svelte:head>
 	<title>Help Center — ShopMate</title>
+	<meta
+		name="description"
+		content="ShopMate Help Center: track your order, check out as a guest, pay by COD, card or UPI, use promo codes, and cancel or return within 30 days."
+	/>
+	{@html `<script type="application/ld+json">${faqJsonLd}</script>`}
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -48,7 +63,7 @@
 			<h2 class="mt-4 text-lg font-bold text-ink">Shipping Policy</h2>
 			<ul class="mt-3 space-y-2 text-sm leading-relaxed text-stone-600">
 				<li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-olive" /> Free shipping on all orders over $50 — otherwise a flat $4.99 fee applies.</li>
-				<li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-olive" /> Delivery takes 3–5 business days, depending on your location.</li>
+				<li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-olive" /> Delivery takes 3–4 business days, depending on your location.</li>
 				<li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-olive" /> Your estimated delivery date is shown at checkout and on the Track Order page.</li>
 				<li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-olive" /> You can track your order any time with your order ID.</li>
 			</ul>

@@ -37,12 +37,19 @@ export type Order = {
 	address: Address;
 	payment: string;
 	placedAt: number; // epoch ms
+	status: 'active' | 'cancelled';
+	notes?: string;
+	giftWrap?: boolean;
 };
+
+/** A delivery address saved to the account (address book). */
+export type SavedAddress = Address & { id: string; label: string; isDefault: boolean };
 
 export type User = { name: string; email: string; passHash: string };
 
 export const FREE_SHIPPING_OVER = 50;
 export const SHIPPING_FEE = 4.99;
+export const GIFT_WRAP_FEE = 2.99;
 
 /** Demo promo codes: WELCOME10 = 10% off, FREESHIP = free shipping. */
 export const PROMOS: Record<string, { type: 'percent' | 'ship'; value: number; label: string }> = {
@@ -87,6 +94,7 @@ class ShopState {
 	search = $state('');
 	user = $state<User | null>(null);
 	orders = $state<Order[]>([]);
+	addresses = $state<SavedAddress[]>([]);
 	promoCode = $state('');
 	toastMsg = $state('');
 	toastId = $state(0);
@@ -105,7 +113,11 @@ class ShopState {
 	constructor() {
 		this.cart = read<CartItem[]>('shopmate_cart', []);
 		this.wishlist = new Set(read<number[]>('shopmate_wishlist', []));
-		this.orders = read<Order[]>('shopmate_orders', []);
+		this.orders = read<Order[]>('shopmate_orders', []).map((o) => ({
+			...o,
+			status: o.status ?? 'active'
+		}));
+		this.addresses = read<SavedAddress[]>('shopmate_addresses', []);
 		this.recentIds = read<number[]>('shopmate_recent', []);
 		this.userReviews = read<Record<number, Review[]>>('shopmate_reviews', {});
 		const sessionEmail = read<string | null>('shopmate_session', null);
@@ -314,9 +326,82 @@ class ShopState {
 		this.showToast('You have been logged out.');
 	}
 
+	// ---- profile ----
+	updateProfile(name: string): boolean {
+		if (!this.user) return false;
+		const clean = name.trim();
+		if (clean.length < 2) return false;
+		const users = read<User[]>('shopmate_users', []);
+		const record = users.find((u) => u.email === this.user!.email);
+		if (!record) return false;
+		record.name = clean;
+		write('shopmate_users', users);
+		this.user = { ...this.user, name: clean };
+		this.showToast('Profile updated');
+		return true;
+	}
+
+	changePassword(current: string, next: string): { ok: boolean; error?: string } {
+		if (!this.user) return { ok: false, error: 'Please log in first.' };
+		if (next.length < 6) return { ok: false, error: 'New password must be at least 6 characters.' };
+		const users = read<User[]>('shopmate_users', []);
+		const record = users.find((u) => u.email === this.user!.email);
+		if (!record || record.passHash !== this.hashPass(current)) {
+			return { ok: false, error: 'Current password is incorrect.' };
+		}
+		record.passHash = this.hashPass(next);
+		write('shopmate_users', users);
+		this.user = { ...record };
+		this.showToast('Password changed');
+		return { ok: true };
+	}
+
+	// ---- address book (saved delivery addresses) ----
+	private persistAddresses() {
+		write('shopmate_addresses', this.addresses);
+	}
+
+	addAddress(a: Omit<SavedAddress, 'id' | 'isDefault'>): SavedAddress {
+		const entry: SavedAddress = {
+			...a,
+			id: 'AD' + Date.now().toString(36).toUpperCase(),
+			isDefault: this.addresses.length === 0
+		};
+		this.addresses = [...this.addresses, entry];
+		this.persistAddresses();
+		return entry;
+	}
+
+	updateAddress(id: string, patch: Partial<Omit<SavedAddress, 'id'>>) {
+		this.addresses = this.addresses.map((a) => (a.id === id ? { ...a, ...patch } : a));
+		this.persistAddresses();
+	}
+
+	removeAddress(id: string) {
+		const wasDefault = this.addresses.find((a) => a.id === id)?.isDefault;
+		this.addresses = this.addresses.filter((a) => a.id !== id);
+		if (wasDefault && this.addresses.length > 0) this.addresses[0].isDefault = true;
+		this.addresses = [...this.addresses];
+		this.persistAddresses();
+	}
+
+	setDefaultAddress(id: string) {
+		this.addresses = this.addresses.map((a) => ({ ...a, isDefault: a.id === id }));
+		this.persistAddresses();
+	}
+
+	get defaultAddress(): SavedAddress | undefined {
+		return this.addresses.find((a) => a.isDefault) ?? this.addresses[0];
+	}
+
 	// ---- orders ----
-	placeOrder(address: Address, payment: string): Order | null {
+	placeOrder(
+		address: Address,
+		payment: string,
+		opts: { notes?: string; giftWrap?: boolean } = {}
+	): Order | null {
 		if (this.cart.length === 0) return null;
+		const giftWrap = opts.giftWrap === true;
 		const items: OrderItem[] = this.cart
 			.map((c): OrderItem | null => {
 				const p = getProduct(c.id);
@@ -332,15 +417,34 @@ class ShopState {
 			subtotal: this.cartSubtotal,
 			discount: this.cartDiscount,
 			shipping: this.cartShipping,
-			total: this.cartTotal,
+			total: this.cartTotal + (giftWrap ? GIFT_WRAP_FEE : 0),
 			address,
 			payment,
-			placedAt: Date.now()
+			placedAt: Date.now(),
+			status: 'active',
+			notes: opts.notes?.trim() ? opts.notes.trim() : undefined,
+			giftWrap: giftWrap || undefined
 		};
 		this.orders = [order, ...this.orders];
 		write('shopmate_orders', this.orders);
 		this.clearCart();
 		return order;
+	}
+
+	/** Cancel an order while it is still Placed or Processing. */
+	cancelOrder(id: string): boolean {
+		const order = this.orders.find((o) => o.id === id);
+		if (!order || order.status !== 'active') return false;
+		if (this.orderStep(order) >= 2) return false;
+		order.status = 'cancelled';
+		this.orders = [...this.orders];
+		write('shopmate_orders', this.orders);
+		this.showToast(`Order ${order.id} cancelled`);
+		return true;
+	}
+
+	isCancellable(order: Order): boolean {
+		return order.status === 'active' && this.orderStep(order) < 2;
 	}
 
 	myOrders(): Order[] {

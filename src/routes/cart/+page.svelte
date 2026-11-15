@@ -54,6 +54,7 @@
 
 <svelte:head>
 	<title>Your Cart — ShopMate</title>
+	<meta name="description" content="Review your ShopMate cart — free shipping over $50, 30-day returns, secure checkout." />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -238,6 +239,14 @@
 							<dt class="text-stone-500">Shipping</dt>
 							<dd class="font-semibold text-ink">
 								{shop.cartShipping === 0 ? 'FREE' : formatPrice(shop.cartShipping)}
+							</dd>
+						</div>
+						<div class="flex justify-between">
+							<dt class="flex items-center gap-1.5 text-stone-500">
+								<Icon name="truck" class="h-4 w-4 text-olive" /> Estimated delivery
+							</dt>
+							<dd class="font-semibold text-ink">
+								{new Date(Date.now() + 4 * 24 * 3_600_000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
 							</dd>
 						</div>
 						<div class="flex justify-between border-t border-line pt-3 text-base">

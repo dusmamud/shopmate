@@ -20,10 +20,16 @@
 			added = new Set(added);
 		}, 1400);
 	}
+
+	function addAllToCart() {
+		for (const p of saved) shop.addToCart(p.id, 1, { silent: true });
+		shop.openCart();
+	}
 </script>
 
 <svelte:head>
 	<title>My Wishlist — ShopMate</title>
+	<meta name="description" content="Your saved ShopMate products — move them to your cart anytime. Free shipping over $50." />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -32,6 +38,15 @@
 		My Wishlist {#if saved.length > 0}<span class="text-stone-400">({saved.length})</span>{/if}
 	</h1>
 	<p class="mt-1 text-sm text-stone-500">Products you've saved for later. They stay on this device.</p>
+	{#if saved.length > 0}
+		<button
+			type="button"
+			onclick={addAllToCart}
+			class="mt-4 flex items-center gap-2 rounded-lg bg-olive px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-olive-dark"
+		>
+			<Icon name="cart" class="h-4 w-4" /> Add all {saved.length} to Cart
+		</button>
+	{/if}
 
 	{#if saved.length === 0}
 		<div class="mt-8 rounded-2xl border border-dashed border-line bg-cream px-6 py-14 text-center">
