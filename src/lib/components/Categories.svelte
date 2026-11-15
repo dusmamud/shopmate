@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { reveal } from '../actions/reveal';
-	import Art from './Art.svelte';
 	import Icon from './Icon.svelte';
 	import { categories } from '../data/products';
 </script>
@@ -17,10 +16,14 @@
 		{#each categories as cat}
 			<a href="#products" class="group w-24 shrink-0 text-center sm:w-auto">
 				<span
-					class="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full p-5 transition duration-300 group-hover:scale-105 group-hover:shadow-lg sm:h-28 sm:w-28"
-					style="background-color: {cat.bg}"
+					class="mx-auto block h-24 w-24 overflow-hidden rounded-full transition duration-300 group-hover:scale-105 group-hover:shadow-lg sm:h-28 sm:w-28"
 				>
-					<Art kind={cat.art} class="h-full w-full transition duration-300 group-hover:scale-110" />
+					<img
+						src={cat.photo}
+						alt={cat.name}
+						loading="lazy"
+						class="h-full w-full object-cover transition duration-300 group-hover:scale-110"
+					/>
 				</span>
 				<span class="mt-3 block text-xs font-semibold text-ink sm:text-sm">{cat.name}</span>
 			</a>

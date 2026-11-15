@@ -17,9 +17,11 @@ Header / navbar (sticky, mobile menu + live search) · Hero · Trust bar (Free S
 
 ## Images
 
-All visuals are generated for this site — no stock photos:
+All visuals are AI-generated product photography in `static/` — no stock photos, no illustrations:
 
-- `static/hero.webp`, `static/offer.webp`, `static/product-headphones.webp`, `static/product-backpack.webp` — AI-generated product photography
-- `src/lib/components/Art.svelte` — hand-drawn flat SVG illustrations for categories and the smartwatch / shoes / perfume products
-- `src/lib/components/Icon.svelte` — real SVG icons throughout (no emoji)
-- Avatars are initial monograms, generated in code
+- `hero.webp`, `offer.webp`, `product-headphones.webp`, `product-backpack.webp` — hero / banner / product photos
+- `product-smartwatch.webp`, `product-shoes.webp`, `product-perfume.webp` — the other three best sellers
+- `cat-electronics.webp`, `cat-fashion.webp`, `cat-home.webp`, `cat-beauty.webp`, `cat-sports.webp`, `cat-accessories.webp` — category circle photos
+- `avatar-hero-1..4.webp`, `avatar-john.webp`, `avatar-sarah.webp`, `avatar-michael.webp` — real customer headshots
+
+Icons are real SVGs in `src/lib/components/Icon.svelte` (no emoji).

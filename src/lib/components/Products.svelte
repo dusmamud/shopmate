@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { reveal } from '../actions/reveal';
-	import Art from './Art.svelte';
 	import Icon from './Icon.svelte';
 	import Stars from './Stars.svelte';
 	import { products } from '../data/products';
@@ -44,23 +43,12 @@
 			{#each filtered as product (product.id)}
 				<article class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-xl">
 					<div class="relative aspect-square overflow-hidden bg-[#f6f1e7]">
-						{#if product.kind === 'photo'}
-							<img
-								src={product.src}
-								alt={product.name}
-								loading="lazy"
-								class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-							/>
-						{:else}
-							<div class="flex h-full w-full items-center justify-center p-8 transition duration-500 group-hover:scale-105">
-								<Art kind={product.src} class="h-full w-full max-w-44" />
-							</div>
-						{/if}
-						{#if product.badge}
-							<span class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-[11px] font-bold text-white">
-								{product.badge}
-							</span>
-						{/if}
+						<img
+							src={product.src}
+							alt={product.name}
+							loading="lazy"
+							class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+						/>
 						<button
 							type="button"
 							aria-label={shop.isWished(product.id) ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
