@@ -59,7 +59,7 @@
 
 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 	<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
-		Your Cart {#if shop.cartCount > 0}<span class="text-base font-semibold text-stone-500">({shop.cartCount} {shop.cartCount === 1 ? 'item' : 'items'})</span>{/if}
+		Your Cart {#if shop.cartCount > 0}<span class="font-sans text-base font-semibold text-stone-500">({shop.cartCount} {shop.cartCount === 1 ? 'item' : 'items'})</span>{/if}
 	</h1>
 
 	{#if shop.cart.length > 0}
@@ -93,7 +93,7 @@
 		</div>
 	{:else}
 		<div class="mt-6 grid gap-6 lg:grid-cols-3">
-			<div class="lg:col-span-2">
+			<div class="min-w-0 lg:col-span-2">
 				<ul class="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
 					{#each lines as line (line.id + '-' + (line.variant ?? ''))}
 						{@const p = line.product!}
@@ -153,7 +153,7 @@
 				</a>
 			</div>
 
-			<aside class="lg:col-span-1">
+			<aside class="min-w-0 lg:col-span-1">
 				<div class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] lg:sticky lg:top-24">
 					<h2 class="text-base font-bold text-ink">Order Summary</h2>
 
@@ -258,7 +258,7 @@
 					<button
 						type="button"
 						onclick={() => goto('/checkout')}
-						class="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark"
+						class="press mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark"
 					>
 						Proceed to Checkout <Icon name="arrow-right" class="h-4 w-4" />
 					</button>

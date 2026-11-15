@@ -1,8 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import 'tailwindcss';
 
+/* ---- Self-hosted fonts (no external request, identical render everywhere) ---- */
+@font-face {
+	font-family: 'Plus Jakarta Sans';
+	src: url('/fonts/plus-jakarta-sans-var.woff2') format('woff2');
+	font-weight: 400 800;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Fraunces';
+	src: url('/fonts/fraunces-var.woff2') format('woff2');
+	font-weight: 500 800;
+	font-style: normal;
+	font-display: swap;
+}
+
 @theme {
-	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+	--font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+	--font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
 
 	--color-olive: #5c7038;
 	--color-olive-2: #6b7f43;
@@ -28,9 +44,20 @@
 	to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes card-in {
+	from { opacity: 0; transform: translateY(14px) scale(0.985); }
+	to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toast-in {
+	from { opacity: 0; transform: translate(-50%, 12px); }
+	to { opacity: 1; transform: translate(-50%, 0); }
+}
+
 html {
 	scroll-behavior: smooth;
 	scroll-padding-top: 96px;
+	overflow-x: clip;
 }
 
 body {
@@ -38,7 +65,14 @@ body {
 	color: var(--color-ink);
 	background: #ffffff;
 	-webkit-font-smoothing: antialiased;
-	overflow-x: hidden;
+	overflow-x: clip;
+}
+
+/* Distinctive display face for headings — the site's signature look */
+h1, h2 {
+	font-family: var(--font-display);
+	font-weight: 650;
+	letter-spacing: -0.015em;
 }
 
 ::selection {
@@ -58,6 +92,7 @@ body {
 	transition:
 		opacity 0.7s ease,
 		transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+	transition-delay: var(--d, 0ms);
 	will-change: opacity, transform;
 }
 .reveal.is-visible {
@@ -72,6 +107,24 @@ body {
 	animation: var(--animate-float);
 }
 
+/* Cascading entrance for product cards: set style="--i: 0" (index) on the card */
+.card-in {
+	animation: card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: calc(var(--i, 0) * 55ms);
+}
+
+/* Tactile press feedback for primary actions */
+.press {
+	transition: transform 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.press:active {
+	transform: scale(0.965);
+}
+
+.animate-toast-in {
+	animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Thin horizontal scrollbars for the category / product rails on mobile */
 .no-scrollbar {
 	scrollbar-width: none;
@@ -84,5 +137,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
 	html { scroll-behavior: auto; }
 	.reveal { opacity: 1; transform: none; transition: none; }
-	.animate-fade-up, .animate-float { animation: none !important; }
+	.animate-fade-up, .animate-float, .card-in, .animate-toast-in { animation: none !important; }
+	.press:active { transform: none; }
 }

@@ -181,11 +181,11 @@
 			}}
 			novalidate
 		>
-			<div class="space-y-6 lg:col-span-2">
+			<div class="min-w-0 space-y-6 lg:col-span-2">
 				<!-- 1. Contact & shipping -->
 				<section class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-6">
 					<h2 class="flex items-center gap-2.5 text-base font-bold text-ink">
-						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-olive text-xs font-bold text-white">1</span>
+						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-olive font-sans text-xs font-bold text-white">1</span>
 						Contact &amp; Shipping
 					</h2>
 					{#if !shop.user}
@@ -282,7 +282,7 @@
 				<!-- 2. Payment -->
 				<section class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-6">
 					<h2 class="flex items-center gap-2.5 text-base font-bold text-ink">
-						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-olive text-xs font-bold text-white">2</span>
+						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-olive font-sans text-xs font-bold text-white">2</span>
 						Payment Method
 					</h2>
 					<div class="mt-4 space-y-3" role="radiogroup" aria-label="Payment method">
@@ -375,7 +375,7 @@
 				<!-- 3. Delivery & gifting -->
 				<section class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-6">
 					<h2 class="flex items-center gap-2.5 text-base font-bold text-ink">
-						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-olive text-xs font-bold text-white">3</span>
+						<span class="flex h-7 w-7 items-center justify-center rounded-full bg-olive font-sans text-xs font-bold text-white">3</span>
 						Delivery &amp; Gifting
 					</h2>
 					<div class="mt-4">
@@ -406,7 +406,7 @@
 			</div>
 
 			<!-- Order summary -->
-			<aside class="lg:col-span-1">
+			<aside class="min-w-0 lg:col-span-1">
 				<div class="rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] lg:sticky lg:top-24">
 					<h2 class="text-base font-bold text-ink">Order Summary</h2>
 					<ul class="mt-4 space-y-3">
@@ -499,7 +499,7 @@
 					<button
 						type="submit"
 						disabled={placing}
-						class="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-olive-dark disabled:opacity-60"
+						class="press mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-olive-dark disabled:opacity-60"
 					>
 						<Icon name="lock" class="h-4 w-4" />
 						{placing ? 'Placing Order…' : `Place Order · ${formatPrice(orderTotal)}`}

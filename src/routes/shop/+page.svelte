@@ -330,7 +330,7 @@
 
 		<div class="min-w-0">
 			<!-- Sort + mobile Filters button -->
-			<div class="flex items-center justify-between gap-3">
+			<div class="flex flex-wrap items-center justify-between gap-3">
 				<p class="text-sm text-stone-500">
 					Showing <span class="font-semibold text-ink">{filtered.length}</span> of {products.length} products
 				</p>
@@ -406,8 +406,8 @@
 				</div>
 			{:else}
 				<div class="mt-6 grid grid-cols-2 gap-4 sm:gap-5 xl:grid-cols-3">
-					{#each filtered as product (product.id)}
-						<article class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+					{#each filtered as product, i (product.id)}
+						<article style="--i: {i}" class="card-in group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-xl">
 							<div class="relative aspect-square overflow-hidden bg-[#f6f1e7]">
 								<a href="/product/{product.id}" aria-label={product.name} class="block h-full w-full">
 									<img
@@ -444,8 +444,8 @@
 								<h2 class="text-sm font-semibold text-ink">
 									<a href="/product/{product.id}" class="hover:text-olive">{product.name}</a>
 								</h2>
-								<p class="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500">
-									<Stars rating={product.rating} />
+								<p class="mt-1.5 flex items-center gap-1 text-xs text-stone-500">
+									<Stars rating={product.rating} class="h-3 w-3 sm:h-3.5 sm:w-3.5" />
 									<span class="font-semibold text-ink">{product.rating.toFixed(1)}</span>
 									<span>({product.reviews})</span>
 								</p>
@@ -456,7 +456,7 @@
 								<button
 									type="button"
 									onclick={() => addToCart(product.id)}
-									class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition {added.has(product.id)
+									class="press mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition {added.has(product.id)
 										? 'bg-olive-dark'
 										: 'bg-olive hover:bg-olive-dark'}"
 								>

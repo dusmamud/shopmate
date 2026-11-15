@@ -64,8 +64,8 @@
 		</div>
 	{:else}
 		<div class="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-5">
-			{#each saved as product (product.id)}
-				<article class="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+			{#each saved as product, i (product.id)}
+				<article style="--i: {i}" class="card-in group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-xl">
 					<div class="relative aspect-square overflow-hidden bg-[#f6f1e7]">
 						<img
 							src={product.src}
@@ -85,8 +85,8 @@
 
 					<div class="flex flex-1 flex-col p-3 sm:p-4">
 						<h3 class="text-sm font-semibold text-ink">{product.name}</h3>
-						<p class="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500">
-							<Stars rating={product.rating} />
+						<p class="mt-1.5 flex items-center gap-1 text-xs text-stone-500">
+							<Stars rating={product.rating} class="h-3 w-3 sm:h-3.5 sm:w-3.5" />
 							<span class="font-semibold text-ink">{product.rating.toFixed(1)}</span>
 							<span>({product.reviews})</span>
 						</p>

@@ -99,8 +99,8 @@
 							<span class="block text-sm font-semibold text-ink group-hover:text-olive">
 								{product.name}
 							</span>
-							<span class="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500">
-								<Stars rating={product.rating} />
+							<span class="mt-1.5 flex items-center gap-1 text-xs text-stone-500">
+								<Stars rating={product.rating} class="h-3 w-3 sm:h-3.5 sm:w-3.5" />
 								<span class="font-semibold text-ink">{product.rating.toFixed(1)}</span>
 								<span>({product.reviews})</span>
 							</span>

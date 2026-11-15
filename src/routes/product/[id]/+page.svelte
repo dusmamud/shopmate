@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import Icon from '#lib/components/Icon.svelte';
 	import Stars from '#lib/components/Stars.svelte';
+	import { reveal } from '../../../lib/actions/reveal';
 	import { getProduct, relatedProducts, type Review } from '../../../lib/data/products';
 	import { shop, formatDate, formatPrice } from '../../../lib/data/store.svelte';
 
@@ -331,7 +332,7 @@
 
 		<div class="mt-5 grid gap-8 lg:grid-cols-2">
 			<!-- Gallery -->
-			<div>
+			<div class="min-w-0">
 				<div class="group relative overflow-hidden rounded-2xl border border-line bg-[#f6f1e7]">
 					<button
 						type="button"
@@ -396,9 +397,9 @@
 			</div>
 
 			<!-- Buy box -->
-			<div>
+			<div class="min-w-0">
 				<p class="text-xs font-bold tracking-widest text-olive uppercase">{product.category}</p>
-				<h1 class="mt-2 text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
+				<h1 class="mt-2 text-[1.4rem] leading-tight font-extrabold tracking-tight text-ink sm:text-3xl">
 					{product.name}
 				</h1>
 				<button
@@ -533,7 +534,7 @@
 						type="button"
 						onclick={addToCart}
 						disabled={product.stock <= 0}
-						class="flex flex-1 items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark disabled:opacity-50"
+						class="press flex flex-1 items-center justify-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark disabled:opacity-50"
 					>
 						<Icon name="cart" class="h-4 w-4" /> Add to Cart
 					</button>
@@ -541,7 +542,7 @@
 						type="button"
 						onclick={buyNow}
 						disabled={product.stock <= 0}
-						class="flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-olive px-5 py-3 text-sm font-semibold text-olive transition hover:bg-olive-soft disabled:opacity-50"
+						class="press flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-olive px-5 py-3 text-sm font-semibold text-olive transition hover:bg-olive-soft disabled:opacity-50"
 					>
 						Buy Now <Icon name="arrow-right" class="h-4 w-4" />
 					</button>
@@ -613,7 +614,10 @@
 
 		<!-- Frequently bought together -->
 		{#if fbtItems.length > 0}
-			<section class="mt-12 rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-6">
+			<section
+			class="mt-12 rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] sm:p-6"
+			use:reveal
+		>
 				<h2 class="text-lg font-extrabold tracking-tight text-ink">Frequently Bought Together</h2>
 				<div class="mt-4 flex flex-wrap items-center gap-3">
 					<a href="/product/{product.id}" class="block h-20 w-20 overflow-hidden rounded-xl bg-[#f6f1e7]">
@@ -665,8 +669,8 @@
 		{/if}
 
 		<!-- Tabs: Description / Specifications / Reviews / Q&A -->
-		<section class="mt-12">
-			<div class="flex gap-1 overflow-x-auto border-b border-line" role="tablist" aria-label="Product information">
+		<section class="mt-12" use:reveal>
+			<div class="no-scrollbar flex gap-1 overflow-x-auto border-b border-line" role="tablist" aria-label="Product information">
 				{#each [['description', 'Description'], ['specs', 'Specifications'], ['reviews', `Reviews (${product.reviews + (allReviews.length - product.seedReviews.length)})`], ['qa', 'Q&A']] as [key, label] (key)}
 					<button
 						type="button"
@@ -944,7 +948,7 @@
 		{/if}
 
 		{#if related.length > 0}
-			<section class="mt-14">
+			<section class="mt-14" use:reveal>
 				<h2 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">You May Also Like</h2>
 				<div class="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
 					{#each related as rel (rel.id)}
@@ -982,7 +986,7 @@
 								<h3 class="text-sm font-semibold text-ink">
 									<a href="/product/{rel.id}" class="hover:text-olive">{rel.name}</a>
 								</h3>
-								<p class="mt-1.5 flex items-center gap-1.5 text-xs text-stone-500">
+								<p class="mt-1.5 flex items-center gap-1 text-xs text-stone-500">
 									<Stars rating={rel.rating} />
 									<span class="font-semibold text-ink">{rel.rating.toFixed(1)}</span>
 									<span>({rel.reviews})</span>
