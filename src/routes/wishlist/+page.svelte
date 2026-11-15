@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '#lib/components/Icon.svelte';
 	import Stars from '#lib/components/Stars.svelte';
+	import Breadcrumbs from '#lib/components/Breadcrumbs.svelte';
 	import { getProduct, type Product } from '../../lib/data/products';
 	import { shop, formatPrice } from '../../lib/data/store.svelte';
 
@@ -26,7 +27,8 @@
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-	<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
+	<Breadcrumbs items={[{ label: 'Wishlist' }]} />
+	<h1 class="mt-4 text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
 		My Wishlist {#if saved.length > 0}<span class="text-stone-400">({saved.length})</span>{/if}
 	</h1>
 	<p class="mt-1 text-sm text-stone-500">Products you've saved for later. They stay on this device.</p>

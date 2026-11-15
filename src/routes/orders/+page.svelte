@@ -6,7 +6,8 @@
 	const myOrders = $derived(shop.myOrders());
 
 	function reorder(order: Order) {
-		for (const item of order.items) shop.addToCart(item.id, item.qty, true);
+		for (const item of order.items)
+			shop.addToCart(item.id, item.qty, { variant: item.variant, silent: true });
 		shop.showToast('Items added back to your cart');
 		goto('/cart');
 	}

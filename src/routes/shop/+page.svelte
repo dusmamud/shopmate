@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import Icon from '#lib/components/Icon.svelte';
 	import Stars from '#lib/components/Stars.svelte';
+	import Breadcrumbs from '#lib/components/Breadcrumbs.svelte';
 	import { categories, products, type Product } from '../../lib/data/products';
 	import { shop } from '../../lib/data/store.svelte';
 
@@ -81,7 +82,8 @@
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-	<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Shop All Products</h1>
+	<Breadcrumbs items={[{ label: 'Shop' }]} />
+	<h1 class="mt-4 text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Shop All Products</h1>
 	<p class="mt-1 text-sm text-stone-500">
 		{filtered.length} {filtered.length === 1 ? 'product' : 'products'}
 		{#if category !== 'All'} in {category}{/if}
@@ -187,6 +189,14 @@
 								class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 							/>
 						</a>
+						<button
+							type="button"
+							aria-label={`Quick view ${product.name}`}
+							onclick={() => shop.openQuickView(product.id)}
+							class="absolute top-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-stone-500 shadow transition hover:scale-110"
+						>
+							<Icon name="eye" class="h-5 w-5" />
+						</button>
 						<button
 							type="button"
 							aria-label={shop.isWished(product.id) ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}

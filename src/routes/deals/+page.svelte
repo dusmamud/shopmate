@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '#lib/components/Icon.svelte';
 	import Stars from '#lib/components/Stars.svelte';
+	import Breadcrumbs from '#lib/components/Breadcrumbs.svelte';
 	import { products } from '../../lib/data/products';
 	import { shop, formatPrice } from '../../lib/data/store.svelte';
 
@@ -58,8 +59,9 @@
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+	<Breadcrumbs items={[{ label: 'Deals' }]} />
 	<!-- Deals hero -->
-	<div class="rounded-3xl bg-cream px-6 py-10 text-center sm:px-10">
+	<div class="mt-4 rounded-3xl bg-cream px-6 py-10 text-center sm:px-10">
 		<p class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold tracking-widest text-olive uppercase shadow-sm">
 			<Icon name="tag" class="h-3.5 w-3.5" /> Limited Time
 		</p>
@@ -107,6 +109,14 @@
 					<span class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-xs font-extrabold text-white shadow">
 						-{discount(product)}%
 					</span>
+					<button
+						type="button"
+						aria-label={`Quick view ${product.name}`}
+						onclick={() => shop.openQuickView(product.id)}
+						class="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-stone-500 shadow transition hover:scale-110"
+					>
+						<Icon name="eye" class="h-5 w-5" />
+					</button>
 					<button
 						type="button"
 						aria-label={shop.isWished(product.id) ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}

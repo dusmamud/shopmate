@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import Icon from '#lib/components/Icon.svelte';
+	import { getProduct } from '../../lib/data/products';
 	import { shop, formatPrice, formatDate, ORDER_STEPS, type Order } from '../../lib/data/store.svelte';
 
 	let searchId = $state('');
@@ -154,7 +155,7 @@
 							</a>
 							<span class="min-w-0 flex-1">
 								<span class="block truncate text-sm font-semibold text-ink">{item.name}</span>
-								<span class="text-xs text-stone-500">Qty {item.qty} · {formatPrice(item.price)} each</span>
+								<span class="text-xs text-stone-500">Qty {item.qty} · {formatPrice(item.price)} each{#if item.variant} · {getProduct(item.id)?.option.label ?? 'Option'}: {item.variant}{/if}</span>
 							</span>
 							<span class="text-sm font-bold text-ink">{formatPrice(item.price * item.qty)}</span>
 						</li>

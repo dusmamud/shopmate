@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import Icon from '#lib/components/Icon.svelte';
+	import CheckoutSteps from '#lib/components/CheckoutSteps.svelte';
+	import { getProduct } from '../../lib/data/products';
 	import { shop, formatPrice, formatDate, type Order } from '../../lib/data/store.svelte';
 
 	let order = $state<Order | undefined>(undefined);
@@ -31,7 +33,8 @@
 			</div>
 		</div>
 	{:else}
-		<div class="text-center">
+		<div class="mx-auto max-w-md"><CheckoutSteps step={3} /></div>
+		<div class="mt-8 text-center">
 			<span class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-olive-soft">
 				<Icon name="check-circle" class="h-11 w-11 text-olive" />
 			</span>
@@ -64,7 +67,7 @@
 						</a>
 						<span class="min-w-0 flex-1">
 							<span class="block truncate text-sm font-semibold text-ink">{item.name}</span>
-							<span class="text-xs text-stone-500">{formatPrice(item.price)} × {item.qty}</span>
+							<span class="text-xs text-stone-500">{formatPrice(item.price)} × {item.qty}{#if item.variant} · {getProduct(item.id)?.option.label ?? 'Option'}: {item.variant}{/if}</span>
 						</span>
 						<span class="text-sm font-bold text-ink">{formatPrice(item.price * item.qty)}</span>
 					</li>

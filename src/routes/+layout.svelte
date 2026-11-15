@@ -4,6 +4,9 @@
 	import Header from '#lib/components/Header.svelte';
 	import Footer from '#lib/components/Footer.svelte';
 	import Toast from '#lib/components/Toast.svelte';
+	import CartDrawer from '#lib/components/CartDrawer.svelte';
+	import QuickView from '#lib/components/QuickView.svelte';
+	import BottomNav from '#lib/components/BottomNav.svelte';
 
 	let { children }: LayoutProps = $props();
 </script>
@@ -26,4 +29,9 @@
 <Header />
 <main>{@render children()}</main>
 <Footer />
+<!-- Spacer so the fixed mobile bottom nav never covers footer content -->
+<div class="h-14 lg:hidden" aria-hidden="true"></div>
+<CartDrawer />
+<QuickView />
+<BottomNav />
 <Toast />

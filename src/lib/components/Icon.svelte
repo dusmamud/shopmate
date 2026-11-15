@@ -4,6 +4,7 @@
 	// Real SVG icons only — no emoji, no text glyphs.
 	const paths: Record<string, string> = {
 		bag: '<path d="M6 7h12l1 13H5L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/>',
+		home: '<path d="m3 11 9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
 		search:
 			'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/>',
 		heart:

@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Icon from '#lib/components/Icon.svelte';
+	import CheckoutSteps from '#lib/components/CheckoutSteps.svelte';
 	import { getProduct } from '../../lib/data/products';
-	import { shop, formatPrice, FREE_SHIPPING_OVER } from '../../lib/data/store.svelte';
+	import { shop, formatPrice, FREE_SHIPPING_OVER, type CartItem } from '../../lib/data/store.svelte';
 
 	let promoInput = $state('');
 	let promoError = $state('');
+	let removed = $state<{ item: CartItem; name: string } | null>(null);
+
+	let undoTimer: ReturnType<typeof setTimeout> | undefined;
 
 	const lines = $derived(
 		shop.cart
@@ -29,6 +33,23 @@
 			promoInput = '';
 		}
 	}
+
+	function removeLine(line: { id: number; qty: number; variant?: string; product?: { name: string } }) {
+		removed = { item: { id: line.id, qty: line.qty, variant: line.variant }, name: line.product?.name ?? 'Item' };
+		shop.removeFromCart(line.id, line.variant);
+		clearTimeout(undoTimer);
+		undoTimer = setTimeout(() => (removed = null), 6000);
+	}
+
+	function undoRemove() {
+		if (!removed) return;
+		shop.addToCart(removed.item.id, removed.item.qty, {
+			variant: removed.item.variant,
+			silent: true
+		});
+		removed = null;
+		clearTimeout(undoTimer);
+	}
 </script>
 
 <svelte:head>
@@ -39,6 +60,23 @@
 	<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
 		Your Cart {#if shop.cartCount > 0}<span class="text-base font-semibold text-stone-500">({shop.cartCount} {shop.cartCount === 1 ? 'item' : 'items'})</span>{/if}
 	</h1>
+
+	{#if shop.cart.length > 0}
+		<div class="mt-5 max-w-2xl"><CheckoutSteps step={1} /></div>
+	{/if}
+
+	{#if removed}
+		<div class="mt-5 flex items-center justify-between gap-3 rounded-xl border border-line bg-ink px-4 py-3 text-sm text-white">
+			<span>Removed <strong>{removed.name}</strong> from your cart.</span>
+			<button
+				type="button"
+				onclick={undoRemove}
+				class="shrink-0 rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-ink transition hover:bg-cream"
+			>
+				Undo
+			</button>
+		</div>
+	{/if}
 
 	{#if shop.cart.length === 0}
 		<div class="mt-8 rounded-2xl border border-dashed border-line bg-cream px-6 py-16 text-center">
@@ -56,7 +94,7 @@
 		<div class="mt-6 grid gap-6 lg:grid-cols-3">
 			<div class="lg:col-span-2">
 				<ul class="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-					{#each lines as line (line.id)}
+					{#each lines as line (line.id + '-' + (line.variant ?? ''))}
 						{@const p = line.product!}
 						<li class="flex gap-4 p-4 sm:p-5">
 							<a href="/product/{p.id}" class="block h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#f6f1e7] sm:h-24 sm:w-24">
@@ -69,19 +107,22 @@
 									</h2>
 									<button
 										type="button"
-										onclick={() => shop.removeFromCart(p.id)}
+										onclick={() => removeLine(line)}
 										aria-label="Remove {p.name} from cart"
 										class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-stone-400 transition hover:bg-red-50 hover:text-red-500"
 									>
 										<Icon name="trash" class="h-4 w-4" />
 									</button>
 								</div>
+								{#if line.variant}
+									<p class="mt-0.5 text-xs text-stone-500">{p.option.label}: {line.variant}</p>
+								{/if}
 								<p class="mt-0.5 text-xs text-stone-500">{formatPrice(p.price)} each</p>
 								<div class="mt-3 flex items-center justify-between gap-3">
 									<div class="flex items-center rounded-lg border border-line">
 										<button
 											type="button"
-											onclick={() => shop.updateQty(p.id, line.qty - 1)}
+											onclick={() => shop.updateQty(p.id, line.qty - 1, line.variant)}
 											aria-label="Decrease quantity of {p.name}"
 											class="flex h-9 w-9 items-center justify-center text-ink transition hover:text-olive"
 										>
@@ -90,7 +131,7 @@
 										<span class="w-8 text-center text-sm font-bold text-ink" aria-live="polite">{line.qty}</span>
 										<button
 											type="button"
-											onclick={() => shop.updateQty(p.id, line.qty + 1)}
+											onclick={() => shop.updateQty(p.id, line.qty + 1, line.variant)}
 											aria-label="Increase quantity of {p.name}"
 											class="flex h-9 w-9 items-center justify-center text-ink transition hover:text-olive"
 										>

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import Icon from '#lib/components/Icon.svelte';
+	import CheckoutSteps from '#lib/components/CheckoutSteps.svelte';
 	import { getProduct } from '../../lib/data/products';
 	import { shop, formatPrice, type Address } from '../../lib/data/store.svelte';
 
@@ -113,6 +114,7 @@
 
 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
 	<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Checkout</h1>
+	<div class="mt-5"><CheckoutSteps step={2} /></div>
 
 	{#if shop.cart.length === 0}
 		<p class="mt-6 text-sm text-stone-500">Your cart is empty. Redirecting…</p>
@@ -134,8 +136,8 @@
 					</h2>
 					{#if !shop.user}
 						<p class="mt-3 rounded-lg bg-cream px-3.5 py-2.5 text-sm text-stone-600">
-							Returning customer?
-							<a href="/login" class="font-semibold text-olive hover:text-olive-dark">Log in</a>
+							Already have an account?
+							<a href="/login?redirect=/checkout" class="font-semibold text-olive hover:text-olive-dark">Log in</a>
 							for faster checkout.
 						</p>
 					{/if}

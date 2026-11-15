@@ -1,10 +1,11 @@
-// Shared shop state (Svelte 5 runes) — cart, wishlist, auth, orders, promo, toast.
+// Shared shop state (Svelte 5 runes) — cart, wishlist, auth, orders, promo, toast,
+// drawer/quick-view UI state, recently viewed and local reviews.
 // Everything is stored locally in the browser (localStorage): this is a demo
 // storefront with no backend, so orders and accounts live on the device.
 // A singleton class instance, so Header, product grids and all pages stay in sync.
-import { getProduct, products } from './products';
+import { getProduct, products, type Review } from './products';
 
-export type CartItem = { id: number; qty: number };
+export type CartItem = { id: number; qty: number; variant?: string };
 
 export type Address = {
 	name: string;
@@ -16,7 +17,14 @@ export type Address = {
 	zip: string;
 };
 
-export type OrderItem = { id: number; name: string; price: number; src: string; qty: number };
+export type OrderItem = {
+	id: number;
+	name: string;
+	price: number;
+	src: string;
+	qty: number;
+	variant?: string;
+};
 
 export type Order = {
 	id: string;
@@ -71,6 +79,8 @@ function write(key: string, value: unknown) {
 	}
 }
 
+export type AddToCartOpts = { variant?: string; silent?: boolean; openDrawer?: boolean };
+
 class ShopState {
 	cart = $state<CartItem[]>([]);
 	wishlist = $state<Set<number>>(new Set());
@@ -81,12 +91,23 @@ class ShopState {
 	toastMsg = $state('');
 	toastId = $state(0);
 
+	/** Cart drawer + quick-view modal state (rendered globally in +layout). */
+	drawerOpen = $state(false);
+	quickViewId = $state<number | null>(null);
+
+	/** Recently viewed product ids, most recent first (max 8). */
+	recentIds = $state<number[]>([]);
+	/** Reviews written by this user on this device, keyed by product id. */
+	private userReviews = $state<Record<number, Review[]>>({});
+
 	private toastTimer: ReturnType<typeof setTimeout> | undefined;
 
 	constructor() {
 		this.cart = read<CartItem[]>('shopmate_cart', []);
 		this.wishlist = new Set(read<number[]>('shopmate_wishlist', []));
 		this.orders = read<Order[]>('shopmate_orders', []);
+		this.recentIds = read<number[]>('shopmate_recent', []);
+		this.userReviews = read<Record<number, Review[]>>('shopmate_reviews', {});
 		const sessionEmail = read<string | null>('shopmate_session', null);
 		if (sessionEmail) {
 			const users = read<User[]>('shopmate_users', []);
@@ -126,31 +147,62 @@ class ShopState {
 		return this.wishlist.size;
 	}
 
-	// ---- cart ----
-	addToCart(id: number, qty = 1, silent = false) {
-		const product = getProduct(id);
-		if (!product) return;
-		const line = this.cart.find((c) => c.id === id);
-		const nextQty = (line?.qty ?? 0) + qty;
-		if (line) line.qty = Math.min(nextQty, product.stock);
-		else this.cart.push({ id, qty: Math.min(qty, product.stock) });
-		this.cart = [...this.cart];
-		write('shopmate_cart', this.cart);
-		if (!silent) this.showToast(`${product.name} added to cart`);
+	/** Recently viewed products (full objects, most recent first). */
+	get recentProducts() {
+		return this.recentIds
+			.map((id) => getProduct(id))
+			.filter((p): p is NonNullable<typeof p> => Boolean(p));
 	}
 
-	updateQty(id: number, qty: number) {
+	// ---- cart drawer + quick view ----
+	openCart() {
+		this.drawerOpen = true;
+	}
+
+	closeCart() {
+		this.drawerOpen = false;
+	}
+
+	openQuickView(id: number) {
+		this.quickViewId = id;
+	}
+
+	closeQuickView() {
+		this.quickViewId = null;
+	}
+
+	// ---- cart (variant-aware: same product in two sizes = two lines) ----
+	addToCart(id: number, qty = 1, opts: AddToCartOpts = {}) {
 		const product = getProduct(id);
 		if (!product) return;
-		if (qty <= 0) return this.removeFromCart(id);
-		const line = this.cart.find((c) => c.id === id);
+		const variant = opts.variant ?? product.option.choices[0];
+		const line = this.cart.find((c) => c.id === id && (c.variant ?? '') === (variant ?? ''));
+		const nextQty = (line?.qty ?? 0) + qty;
+		if (line) line.qty = Math.min(nextQty, product.stock);
+		else this.cart.push({ id, qty: Math.min(qty, product.stock), variant });
+		this.cart = [...this.cart];
+		write('shopmate_cart', this.cart);
+		if (opts.silent) return;
+		if (opts.openDrawer === false) {
+			this.showToast(`${product.name} added to cart`);
+		} else {
+			// Big-store pattern: adding opens the cart drawer as confirmation.
+			this.drawerOpen = true;
+		}
+	}
+
+	updateQty(id: number, qty: number, variant?: string) {
+		const product = getProduct(id);
+		if (!product) return;
+		if (qty <= 0) return this.removeFromCart(id, variant);
+		const line = this.cart.find((c) => c.id === id && (c.variant ?? '') === (variant ?? ''));
 		if (line) line.qty = Math.min(qty, product.stock);
 		this.cart = [...this.cart];
 		write('shopmate_cart', this.cart);
 	}
 
-	removeFromCart(id: number) {
-		this.cart = this.cart.filter((c) => c.id !== id);
+	removeFromCart(id: number, variant?: string) {
+		this.cart = this.cart.filter((c) => !(c.id === id && (c.variant ?? '') === (variant ?? '')));
 		write('shopmate_cart', this.cart);
 	}
 
@@ -176,6 +228,24 @@ class ShopState {
 
 	isWished(id: number) {
 		return this.wishlist.has(id);
+	}
+
+	// ---- recently viewed ----
+	trackView(id: number) {
+		this.recentIds = [id, ...this.recentIds.filter((x) => x !== id)].slice(0, 8);
+		write('shopmate_recent', this.recentIds);
+	}
+
+	// ---- reviews (local: seed reviews + ones the user writes on this device) ----
+	getReviews(id: number): Review[] {
+		const product = getProduct(id);
+		return [...(this.userReviews[id] ?? []), ...(product?.seedReviews ?? [])];
+	}
+
+	addReview(id: number, review: Omit<Review, 'date'>) {
+		const full: Review = { ...review, date: formatDate(Date.now()) };
+		this.userReviews[id] = [full, ...(this.userReviews[id] ?? [])];
+		write('shopmate_reviews', this.userReviews);
 	}
 
 	// ---- promo ----
@@ -248,9 +318,11 @@ class ShopState {
 	placeOrder(address: Address, payment: string): Order | null {
 		if (this.cart.length === 0) return null;
 		const items: OrderItem[] = this.cart
-			.map((c) => {
+			.map((c): OrderItem | null => {
 				const p = getProduct(c.id);
-				return p ? { id: p.id, name: p.name, price: p.price, src: p.src, qty: c.qty } : null;
+				return p
+					? { id: p.id, name: p.name, price: p.price, src: p.src, qty: c.qty, variant: c.variant }
+					: null;
 			})
 			.filter((x): x is OrderItem => x !== null);
 		const order: Order = {

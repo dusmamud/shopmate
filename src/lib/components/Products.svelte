@@ -51,6 +51,14 @@
 						/>
 						<button
 							type="button"
+							aria-label={`Quick view ${product.name}`}
+							onclick={() => shop.openQuickView(product.id)}
+							class="absolute top-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-stone-500 shadow transition hover:scale-110"
+						>
+							<Icon name="eye" class="h-5 w-5" />
+						</button>
+						<button
+							type="button"
 							aria-label={shop.isWished(product.id) ? `Remove ${product.name} from wishlist` : `Save ${product.name} to wishlist`}
 							aria-pressed={shop.isWished(product.id)}
 							onclick={() => shop.toggleWishlist(product.id)}
