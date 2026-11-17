@@ -7,6 +7,8 @@
 
 	let searchId = $state('');
 	let submitted = $state(false);
+	let emailInput = $state('');
+	let emailSubmitted = $state(false);
 	let confirmCancel = $state(false);
 
 	// The order ID comes from ?id=, which is only readable in the browser
@@ -19,11 +21,23 @@
 		}
 	});
 
-	const found = $derived(submitted && searchId.trim() ? shop.findOrder(searchId) : undefined);
+	// Most recent order on this device with a matching email (orders are
+	// stored newest-first, so the first match is the most recent). The ID
+	// lookup wins when both have been submitted.
+	const found = $derived(
+		(submitted && searchId.trim() ? shop.findOrder(searchId) : undefined) ??
+			(emailSubmitted && emailInput.trim()
+				? shop.orders.find((o) => o.email.toLowerCase() === emailInput.trim().toLowerCase())
+				: undefined)
+	);
 	const recent = $derived(shop.myOrders().slice(0, 3));
 
 	function track() {
 		submitted = true;
+	}
+
+	function trackByEmail() {
+		emailSubmitted = true;
 	}
 
 	function quickTrack(order: Order) {
@@ -73,13 +87,55 @@
 		</p>
 	{/if}
 
-	{#if submitted && !found}
+	<div class="mt-5 flex items-center gap-3 text-xs font-semibold tracking-wide text-stone-400 uppercase">
+		<span class="h-px flex-1 bg-line" aria-hidden="true"></span>
+		or track by email
+		<span class="h-px flex-1 bg-line" aria-hidden="true"></span>
+	</div>
+
+	<form
+		class="mt-4 flex gap-2"
+		onsubmit={(e) => {
+			e.preventDefault();
+			trackByEmail();
+		}}
+	>
+		<label class="relative min-w-0 flex-1">
+			<span class="sr-only">Email address used for the order</span>
+			<Icon name="mail" class="pointer-events-none absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-stone-400" />
+			<input
+				type="email"
+				bind:value={emailInput}
+				placeholder="you@example.com"
+				autocomplete="email"
+				class="w-full rounded-lg border border-line bg-white py-3 pr-4 pl-11 text-sm focus:border-olive focus:ring-2 focus:ring-olive/30 focus:outline-none"
+			/>
+		</label>
+		<button
+			type="submit"
+			class="flex shrink-0 items-center gap-2 rounded-lg bg-olive px-5 py-3 text-sm font-semibold text-white transition hover:bg-olive-dark"
+		>
+			<Icon name="search" class="h-4 w-4" /> Find order
+		</button>
+	</form>
+
+	{#if submitted && !found && !emailSubmitted}
 		<div class="mt-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-5">
 			<Icon name="alert" class="h-5 w-5 shrink-0 text-red-500" />
 			<div>
 				<p class="text-sm font-bold text-red-700">We couldn't find an order with this ID.</p>
 				<p class="mt-1 text-sm text-red-600">
 					Check the ID and try again. Order IDs start with “SM” and are shown right after you place an order.
+				</p>
+			</div>
+		</div>
+	{:else if emailSubmitted && !found}
+		<div class="mt-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-5">
+			<Icon name="alert" class="h-5 w-5 shrink-0 text-red-500" />
+			<div>
+				<p class="text-sm font-bold text-red-700">We couldn't find an order for this email.</p>
+				<p class="mt-1 text-sm text-red-600">
+					Check the email address and try again — it must match the email used when the order was placed, on this device.
 				</p>
 			</div>
 		</div>

@@ -49,11 +49,18 @@
 							loading="lazy"
 							class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 						/>
+						{#if product.isNew}
+							<span
+								class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-xs font-extrabold text-white shadow"
+							>
+								New
+							</span>
+						{/if}
 						<button
 							type="button"
 							aria-label={`Quick view ${product.name}`}
 							onclick={() => shop.openQuickView(product.id)}
-							class="absolute top-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-stone-500 shadow transition hover:scale-110"
+							class="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-stone-500 shadow transition hover:scale-110"
 						>
 							<Icon name="eye" class="h-5 w-5" />
 						</button>
@@ -93,6 +100,17 @@
 						>
 							<Icon name={added.has(product.id) ? 'check' : 'cart'} class="h-4 w-4" />
 							{added.has(product.id) ? 'Added to Cart' : 'Add to Cart'}
+						</button>
+						<button
+							type="button"
+							onclick={() => shop.toggleCompare(product.id)}
+							aria-pressed={shop.isCompared(product.id)}
+							class="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition {shop.isCompared(product.id)
+								? 'bg-olive-soft text-olive'
+								: 'text-stone-500 hover:bg-cream hover:text-olive'}"
+						>
+							<Icon name={shop.isCompared(product.id) ? 'check' : 'sliders'} class="h-4 w-4" />
+							{shop.isCompared(product.id) ? 'Added to Compare' : 'Add to Compare'}
 						</button>
 					</div>
 				</article>

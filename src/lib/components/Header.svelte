@@ -166,6 +166,18 @@
 		<!-- Actions -->
 		<div class="ml-auto flex items-center gap-1 sm:gap-2 md:ml-0">
 			<a
+				href="/compare"
+				class="relative rounded-full p-2 text-ink transition hover:bg-cream"
+				aria-label="Compare products, {shop.compare.length} selected"
+			>
+				<Icon name="sliders" class="h-5 w-5" />
+				{#if shop.compare.length > 0}
+					<span class="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-olive px-1 text-[10px] font-bold text-white">
+						{shop.compare.length}
+					</span>
+				{/if}
+			</a>
+			<a
 				href="/wishlist"
 				class="relative rounded-full p-2 text-ink transition hover:bg-cream"
 				aria-label="Wishlist, {shop.wishlistCount} items saved"
@@ -238,6 +250,20 @@
 					>
 						<Icon name="user" class="h-4 w-4" />
 						{shop.user ? `My Account (${shop.user.name})` : 'Login / Sign Up'}
+					</a>
+				</li>
+				<li>
+					<a
+						href="/compare"
+						class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-cream hover:text-olive"
+						onclick={() => (menuOpen = false)}
+					>
+						<Icon name="sliders" class="h-4 w-4" /> Compare
+						{#if shop.compare.length > 0}
+							<span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-olive px-1.5 text-[11px] font-bold text-white">
+								{shop.compare.length}
+							</span>
+						{/if}
 					</a>
 				</li>
 				<li>

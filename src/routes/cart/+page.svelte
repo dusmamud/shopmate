@@ -2,11 +2,14 @@
 	import { goto } from '$app/navigation';
 	import Icon from '#lib/components/Icon.svelte';
 	import CheckoutSteps from '#lib/components/CheckoutSteps.svelte';
-	import { getProduct } from '../../lib/data/products';
+	import { getProduct, relatedProducts } from '../../lib/data/products';
 	import { shop, formatPrice, FREE_SHIPPING_OVER, type CartItem } from '../../lib/data/store.svelte';
 
 	let promoInput = $state('');
 	let promoError = $state('');
+	let giftInput = $state('');
+	let giftError = $state('');
+	let added = $state(new Set<number>());
 	let removed = $state<{ item: CartItem; name: string } | null>(null);
 
 	let undoTimer: ReturnType<typeof setTimeout> | undefined;
@@ -33,6 +36,30 @@
 			promoInput = '';
 		}
 	}
+
+	function applyGiftCard() {
+		giftError = '';
+		if (!giftInput.trim()) return;
+		if (shop.redeemGiftCard(giftInput) <= 0) {
+			giftError = 'That gift card code is not valid or has no balance left.';
+		} else {
+			giftInput = '';
+		}
+	}
+
+	function addSuggested(id: number) {
+		shop.addToCart(id);
+		added.add(id);
+		added = new Set(added);
+		setTimeout(() => {
+			added.delete(id);
+			added = new Set(added);
+		}, 1400);
+	}
+
+	const suggestions = $derived(
+		shop.cart.length > 0 ? relatedProducts(shop.cart[0].id, 4) : []
+	);
 
 	function removeLine(line: { id: number; qty: number; variant?: string; product?: { name: string } }) {
 		removed = { item: { id: line.id, qty: line.qty, variant: line.variant }, name: line.product?.name ?? 'Item' };
@@ -143,6 +170,13 @@
 										{formatPrice(p.price * line.qty)}
 									</p>
 								</div>
+								<button
+									type="button"
+									onclick={() => shop.moveLineToWishlist(line.id, line.variant)}
+									class="mt-2.5 flex items-center gap-1.5 text-xs font-semibold text-stone-500 transition hover:text-olive"
+								>
+									<Icon name="heart" class="h-3.5 w-3.5" /> Save for later
+								</button>
 							</div>
 						</li>
 					{/each}
@@ -224,6 +258,55 @@
 						</form>
 					{/if}
 
+					<!-- Gift card -->
+					{#if shop.giftCardCredit > 0}
+						<div class="mt-4 flex items-center justify-between rounded-lg border border-olive/30 bg-olive-soft px-3 py-2.5">
+							<span class="flex items-center gap-2 text-sm font-semibold text-olive">
+								<Icon name="tag" class="h-4 w-4" /> Gift card −{formatPrice(shop.giftCardCredit)}
+							</span>
+							<button
+								type="button"
+								onclick={() => shop.clearGiftCardCredit()}
+								class="flex items-center gap-1 text-xs font-medium text-stone-500 hover:text-red-500"
+							>
+								<Icon name="close" class="h-3.5 w-3.5" /> Remove
+							</button>
+						</div>
+					{:else}
+						<form
+							class="mt-4"
+							onsubmit={(e) => {
+								e.preventDefault();
+								applyGiftCard();
+							}}
+						>
+							<label for="giftcard" class="text-xs font-semibold text-stone-500">Gift card</label>
+							<div class="mt-1.5 flex gap-2">
+								<input
+									id="giftcard"
+									type="text"
+									bind:value={giftInput}
+									placeholder="SMGC-XXXXXX"
+									autocomplete="off"
+									class="min-w-0 flex-1 rounded-lg border border-line px-3 py-2.5 font-mono text-sm uppercase placeholder:normal-case focus:border-olive focus:ring-2 focus:ring-olive/30 focus:outline-none"
+								/>
+								<button
+									type="submit"
+									class="shrink-0 rounded-lg border border-olive px-4 py-2.5 text-sm font-semibold text-olive transition hover:bg-olive-soft"
+								>
+									Apply
+								</button>
+							</div>
+							{#if giftError}
+								<p class="mt-1.5 flex items-center gap-1.5 text-xs text-red-600">
+									<Icon name="alert" class="h-3.5 w-3.5" /> {giftError}
+								</p>
+							{:else}
+								<p class="mt-1.5 text-xs text-stone-400">Enter a gift card code from your account.</p>
+							{/if}
+						</form>
+					{/if}
+
 					<dl class="mt-5 space-y-2.5 border-t border-line pt-4 text-sm">
 						<div class="flex justify-between">
 							<dt class="text-stone-500">Subtotal</dt>
@@ -233,6 +316,12 @@
 							<div class="flex justify-between">
 								<dt class="text-stone-500">Discount</dt>
 								<dd class="font-semibold text-green-700">−{formatPrice(shop.cartDiscount)}</dd>
+							</div>
+						{/if}
+						{#if shop.giftCardCredit > 0}
+							<div class="flex justify-between">
+								<dt class="text-stone-500">Gift card credit</dt>
+								<dd class="font-semibold text-green-700">−{formatPrice(shop.giftCardCredit)}</dd>
 							</div>
 						{/if}
 						<div class="flex justify-between">
@@ -268,5 +357,51 @@
 				</div>
 			</aside>
 		</div>
+
+		{#if suggestions.length > 0}
+			<section class="mt-12" aria-label="You may also like">
+				<h2 class="text-lg font-extrabold tracking-tight text-ink sm:text-xl">You may also like</h2>
+				<div class="mt-5 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+					{#each suggestions as product, i (product.id)}
+						<article style="--i: {i}" class="card-in group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+							<div class="relative aspect-square overflow-hidden bg-[#f6f1e7]">
+								<a href="/product/{product.id}" aria-label={product.name} class="block h-full w-full">
+									<img
+										src={product.src}
+										alt={product.name}
+										loading="lazy"
+										class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+									/>
+								</a>
+								{#if product.isNew}
+									<span class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-white uppercase shadow">
+										New
+									</span>
+								{/if}
+							</div>
+							<div class="flex flex-1 flex-col p-3 sm:p-4">
+								<h3 class="text-sm font-semibold text-ink">
+									<a href="/product/{product.id}" class="hover:text-olive">{product.name}</a>
+								</h3>
+								<p class="mt-2 flex items-baseline gap-2">
+									<span class="text-base font-extrabold text-ink">{formatPrice(product.price)}</span>
+									<span class="text-xs text-stone-400 line-through">{formatPrice(product.oldPrice)}</span>
+								</p>
+								<button
+									type="button"
+									onclick={() => addSuggested(product.id)}
+									class="press mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-white transition {added.has(product.id)
+										? 'bg-olive-dark'
+										: 'bg-olive hover:bg-olive-dark'}"
+								>
+									<Icon name={added.has(product.id) ? 'check' : 'cart'} class="h-4 w-4" />
+									{added.has(product.id) ? 'Added to Cart' : 'Add to Cart'}
+								</button>
+							</div>
+						</article>
+					{/each}
+				</div>
+			</section>
+		{/if}
 	{/if}
 </div>

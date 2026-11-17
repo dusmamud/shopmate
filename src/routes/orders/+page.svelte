@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import Icon from '#lib/components/Icon.svelte';
 	import { shop, formatPrice, formatDate, ORDER_STEPS, type Order } from '../../lib/data/store.svelte';
 
@@ -7,11 +6,34 @@
 
 	let confirmCancelId = $state<string | null>(null);
 
-	function reorder(order: Order) {
-		for (const item of order.items)
-			shop.addToCart(item.id, item.qty, { variant: item.variant, silent: true });
-		shop.showToast('Items added back to your cart');
-		goto('/cart');
+	// Return form state (one form open at a time; items keyed by their index).
+	let returnOpenId = $state<string | null>(null);
+	let returnChecked = $state<Set<number>>(new Set());
+	let returnReason = $state('Wrong size');
+	let returnDetail = $state('');
+
+	const RETURN_REASONS = [
+		'Wrong size',
+		'Defective or damaged',
+		'Changed my mind',
+		'Arrived late',
+		'Other'
+	];
+
+	function openReturnForm(order: Order) {
+		returnOpenId = order.id;
+		returnChecked = new Set(order.items.map((_, i) => i));
+		returnReason = 'Wrong size';
+		returnDetail = '';
+	}
+
+	function submitReturn(order: Order) {
+		const items = order.items
+			.filter((_, i) => returnChecked.has(i))
+			.map((item) => ({ productId: item.id, qty: 1 }));
+		if (shop.requestReturn(order.id, items, returnReason, returnDetail)) {
+			returnOpenId = null;
+		}
 	}
 
 	function progress(order: Order) {
@@ -59,6 +81,7 @@
 		<div class="mt-6 space-y-4">
 			{#each myOrders as order (order.id)}
 				{@const step = shop.orderStep(order)}
+				{@const ret = shop.getReturn(order.id)}
 				<article class="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
 					<div class="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-cream/60 px-5 py-3.5">
 						<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
@@ -105,11 +128,24 @@
 							</a>
 							<button
 								type="button"
-								onclick={() => reorder(order)}
+								onclick={() => shop.buyAgain(order.id)}
 								class="inline-flex items-center gap-1.5 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-olive"
 							>
-								<Icon name="cart" class="h-4 w-4" /> Reorder
+								<Icon name="cart" class="h-4 w-4" /> Buy again
 							</button>
+							{#if ret}
+								<span class="inline-flex items-center gap-1.5 rounded-lg bg-olive-soft px-4 py-2.5 text-sm font-semibold text-olive">
+									<Icon name="returns" class="h-4 w-4" /> Return {ret.status}
+								</span>
+							{:else if step >= 2 && order.status === 'active'}
+								<button
+									type="button"
+									onclick={() => openReturnForm(order)}
+									class="inline-flex items-center gap-1.5 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-olive"
+								>
+									<Icon name="returns" class="h-4 w-4" /> Request return
+								</button>
+							{/if}
 							{#if shop.isCancellable(order)}
 								{#if confirmCancelId === order.id}
 									<button
@@ -140,6 +176,91 @@
 								{/if}
 							{/if}
 						</div>
+
+						{#if ret}
+							<div class="mt-4 rounded-xl border border-olive/30 bg-olive-soft px-4 py-3.5 text-sm">
+								<p class="flex items-center gap-2 font-bold text-olive-dark">
+									<Icon name="check-circle" class="h-4 w-4" /> Return requested
+								</p>
+								<p class="mt-1.5 text-stone-600">
+									Request <span class="font-mono font-bold text-ink">{ret.id}</span> · {ret.reason} ·
+									Requested {formatDate(ret.requestedAt)} · Status: {ret.status}
+								</p>
+								<p class="mt-1 text-stone-500">A return label will be emailed to you shortly.</p>
+							</div>
+						{:else if returnOpenId === order.id}
+							<form
+								class="mt-4 rounded-xl border border-line bg-cream/60 p-4"
+								onsubmit={(e) => {
+									e.preventDefault();
+									submitReturn(order);
+								}}
+							>
+								<h3 class="text-sm font-bold text-ink">Request a return</h3>
+								<fieldset class="mt-3">
+									<legend class="sr-only">Items to return</legend>
+									<ul class="space-y-2">
+										{#each order.items as item, i (item.id + '-' + (item.variant ?? '') + '-' + i)}
+											<li>
+												<label class="flex cursor-pointer items-center gap-2.5 text-sm text-stone-700">
+													<input
+														type="checkbox"
+														checked={returnChecked.has(i)}
+														onchange={(e) => {
+															const next = new Set(returnChecked);
+															if ((e.target as HTMLInputElement).checked) next.add(i);
+															else next.delete(i);
+															returnChecked = next;
+														}}
+														class="h-4 w-4 accent-[#5c7038]"
+													/>
+													<span class="min-w-0 flex-1 truncate">{item.name}{#if item.variant} · {item.variant}{/if}</span>
+													<span class="shrink-0 text-xs text-stone-500">Qty 1</span>
+												</label>
+											</li>
+										{/each}
+									</ul>
+								</fieldset>
+								<div class="mt-3 grid gap-3 sm:grid-cols-2">
+									<label class="block">
+										<span class="text-xs font-semibold text-stone-500">Reason</span>
+										<select
+											bind:value={returnReason}
+											class="mt-1.5 w-full rounded-lg border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-olive focus:ring-2 focus:ring-olive/30 focus:outline-none"
+										>
+											{#each RETURN_REASONS as reason}
+												<option value={reason}>{reason}</option>
+											{/each}
+										</select>
+									</label>
+									<label class="block">
+										<span class="text-xs font-semibold text-stone-500">Details (optional)</span>
+										<textarea
+											bind:value={returnDetail}
+											rows="1"
+											placeholder="Tell us a little more..."
+											class="mt-1.5 w-full resize-none rounded-lg border border-line bg-white px-3 py-2.5 text-sm text-ink placeholder:text-stone-400 focus:border-olive focus:ring-2 focus:ring-olive/30 focus:outline-none"
+										></textarea>
+									</label>
+								</div>
+								<div class="mt-3 flex flex-wrap gap-2">
+									<button
+										type="submit"
+										disabled={returnChecked.size === 0}
+										class="rounded-lg bg-olive px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-olive-dark disabled:cursor-not-allowed disabled:opacity-50"
+									>
+										Submit return request
+									</button>
+									<button
+										type="button"
+										onclick={() => (returnOpenId = null)}
+										class="rounded-lg border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-olive"
+									>
+										Cancel
+									</button>
+								</div>
+							</form>
+						{/if}
 					</div>
 				</article>
 			{/each}

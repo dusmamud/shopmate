@@ -527,6 +527,17 @@
 						<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
 						Share
 					</button>
+					<button
+						type="button"
+						onclick={() => shop.toggleCompare(product.id)}
+						aria-pressed={shop.isCompared(product.id)}
+						class="flex h-11 items-center gap-2 rounded-lg border border-line bg-white px-4 text-sm font-semibold transition hover:border-olive {shop.isCompared(product.id)
+							? 'text-olive'
+							: 'text-stone-600 hover:text-olive'}"
+					>
+						<Icon name={shop.isCompared(product.id) ? 'check' : 'sliders'} class="h-4 w-4" />
+						{shop.isCompared(product.id) ? 'Added to Compare' : 'Compare'}
+					</button>
 				</div>
 
 				<div class="mt-4 flex flex-col gap-3 sm:flex-row">
@@ -962,6 +973,13 @@
 										class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 									/>
 								</a>
+								{#if rel.isNew}
+									<span
+										class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-xs font-extrabold text-white shadow"
+									>
+										New
+									</span>
+								{/if}
 								<button
 									type="button"
 									aria-label={shop.isWished(rel.id) ? `Remove ${rel.name} from wishlist` : `Save ${rel.name} to wishlist`}

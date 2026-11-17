@@ -31,4 +31,14 @@
 	<url><loc>https://shopmates.pages.dev/product/5</loc><changefreq>monthly</changefreq></url>
 	<url><loc>https://shopmates.pages.dev/product/6</loc><changefreq>monthly</changefreq></url>
 	<url><loc>https://shopmates.pages.dev/product/7</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/compare</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/new-arrivals</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/best-sellers</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/brands</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/recently-viewed</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/gift-cards</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/cookie-policy</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/accessibility</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/sitemap</loc><changefreq>monthly</changefreq></url>
+	<url><loc>https://shopmates.pages.dev/careers</loc><changefreq>monthly</changefreq></url>
 </urlset>

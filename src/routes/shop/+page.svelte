@@ -27,6 +27,7 @@
 
 	let q = $state('');
 	let category = $state('All');
+	let brand = $state('All');
 	let sort = $state<SortKey>('featured');
 	let price = $state<PriceKey>('all');
 	let minRating = $state(0);
@@ -42,6 +43,7 @@
 	$effect(() => {
 		q = page.url.searchParams.get('q') ?? '';
 		category = page.url.searchParams.get('category') ?? 'All';
+		brand = page.url.searchParams.get('brand') ?? 'All';
 	});
 
 	// Bottom-sheet drawer: focus the close button and lock body scroll.
@@ -65,6 +67,12 @@
 		return counts;
 	});
 
+	const brands = $derived.by(() => {
+		const seen = new Map<string, number>();
+		for (const p of products) seen.set(p.brand, (seen.get(p.brand) ?? 0) + 1);
+		return [...seen.entries()].sort((a, b) => a[0].localeCompare(b[0]));
+	});
+
 	function priceMatches(p: Product): boolean {
 		switch (price) {
 			case 'under25':
@@ -81,11 +89,18 @@
 	}
 
 	const activeFilterCount = $derived(
-		(price !== 'all' ? 1 : 0) + (minRating > 0 ? 1 : 0) + (onSale ? 1 : 0) + (inStock ? 1 : 0)
+		(price !== 'all' ? 1 : 0) +
+			(minRating > 0 ? 1 : 0) +
+			(onSale ? 1 : 0) +
+			(inStock ? 1 : 0) +
+			(brand !== 'All' ? 1 : 0)
 	);
 
 	const activeChips = $derived.by(() => {
 		const chips: { key: string; label: string; clear: () => void }[] = [];
+		if (brand !== 'All') {
+			chips.push({ key: 'brand', label: `Brand: ${brand}`, clear: () => (brand = 'All') });
+		}
 		if (price !== 'all') {
 			chips.push({
 				key: 'price',
@@ -108,6 +123,7 @@
 	const filtered = $derived.by(() => {
 		let list: Product[] = products;
 		if (category !== 'All') list = list.filter((p) => p.category === category);
+		if (brand !== 'All') list = list.filter((p) => p.brand === brand);
 		const needle = q.trim().toLowerCase();
 		if (needle) {
 			list = list.filter(
@@ -138,8 +154,14 @@
 		const params = new URLSearchParams();
 		if (q.trim()) params.set('q', q.trim());
 		if (category !== 'All') params.set('category', category);
+		if (brand !== 'All') params.set('brand', brand);
 		const qs = params.toString();
 		goto(qs ? `/shop?${qs}` : '/shop', { replaceState: true });
+	}
+
+	function pickBrand(name: string) {
+		brand = name;
+		syncUrl();
 	}
 
 	function pickCategory(name: string) {
@@ -152,6 +174,7 @@
 		minRating = 0;
 		onSale = false;
 		inStock = false;
+		brand = 'All';
 	}
 
 	function clearAll() {
@@ -183,6 +206,34 @@
 </svelte:head>
 
 {#snippet filterControls()}
+	<div>
+		<h3 class="text-sm font-bold text-ink">Brand</h3>
+		<div class="mt-2.5 flex flex-wrap gap-2" role="group" aria-label="Filter by brand">
+			<button
+				type="button"
+				onclick={() => pickBrand('All')}
+				aria-pressed={brand === 'All'}
+				class="min-h-11 rounded-full px-4 text-sm font-semibold transition {brand === 'All'
+					? 'bg-olive text-white'
+					: 'border border-line bg-white text-ink hover:border-olive'}"
+			>
+				All brands
+			</button>
+			{#each brands as [name, count] (name)}
+				<button
+					type="button"
+					onclick={() => pickBrand(name)}
+					aria-pressed={brand === name}
+					class="min-h-11 rounded-full px-4 text-sm font-semibold transition {brand === name
+						? 'bg-olive text-white'
+						: 'border border-line bg-white text-ink hover:border-olive'}"
+				>
+					{name} ({count})
+				</button>
+			{/each}
+		</div>
+	</div>
+
 	<div>
 		<h3 class="text-sm font-bold text-ink">Price</h3>
 		<div class="mt-2.5 flex flex-wrap gap-2" role="group" aria-label="Filter by price">
@@ -256,6 +307,7 @@
 	<p class="mt-1 text-sm text-stone-500">
 		{filtered.length} {filtered.length === 1 ? 'product' : 'products'}
 		{#if category !== 'All'} in {category}{/if}
+		{#if brand !== 'All'} by {brand}{/if}
 		{#if q.trim()} matching “{q.trim()}”{/if}
 	</p>
 
@@ -417,11 +469,16 @@
 										class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 									/>
 								</a>
+								{#if product.isNew}
+									<span class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-white uppercase shadow">
+										New
+									</span>
+								{/if}
 								<button
 									type="button"
 									aria-label={`Quick view ${product.name}`}
 									onclick={() => shop.openQuickView(product.id)}
-									class="absolute top-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-stone-500 shadow transition hover:scale-110"
+									class="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-full bg-white text-stone-500 shadow transition hover:scale-110"
 								>
 									<Icon name="eye" class="h-5 w-5" />
 								</button>

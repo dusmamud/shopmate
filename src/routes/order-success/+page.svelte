@@ -131,6 +131,12 @@
 				<Icon name="package" class="h-4 w-4" /> Track Order
 			</a>
 			<a
+				href="/invoice?order={order.id}"
+				class="inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:border-olive"
+			>
+				View Invoice
+			</a>
+			<a
 				href="/shop"
 				class="inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:border-olive"
 			>

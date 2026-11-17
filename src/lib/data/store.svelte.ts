@@ -40,10 +40,34 @@ export type Order = {
 	status: 'active' | 'cancelled';
 	notes?: string;
 	giftWrap?: boolean;
+	/** Gift-card credit applied to this order (0 when none). */
+	giftCardCredit?: number;
 };
 
 /** A delivery address saved to the account (address book). */
 export type SavedAddress = Address & { id: string; label: string; isDefault: boolean };
+
+/** A return requested by the customer for one of their orders (demo, local only). */
+export type ReturnRequest = {
+	id: string;
+	orderId: string;
+	items: { productId: number; qty: number }[];
+	reason: string;
+	detail?: string;
+	status: 'requested' | 'approved';
+	requestedAt: number;
+};
+
+/** A digital gift card bought on this device (demo, local only). */
+export type GiftCard = {
+	code: string;
+	amount: number;
+	balance: number;
+	toName: string;
+	fromName: string;
+	message?: string;
+	createdAt: number;
+};
 
 export type User = { name: string; email: string; passHash: string };
 
@@ -96,6 +120,14 @@ class ShopState {
 	orders = $state<Order[]>([]);
 	addresses = $state<SavedAddress[]>([]);
 	promoCode = $state('');
+	/** Gift-card credit applied to the current checkout (redeemed from a card). */
+	giftCardCredit = $state(0);
+	/** Product ids in the compare tray (max 4), most recent first. */
+	compare = $state<number[]>([]);
+	/** Return requests placed on this device. */
+	returns = $state<ReturnRequest[]>([]);
+	/** Gift cards bought on this device. */
+	giftCards = $state<GiftCard[]>([]);
 	toastMsg = $state('');
 	toastId = $state(0);
 
@@ -119,6 +151,9 @@ class ShopState {
 		}));
 		this.addresses = read<SavedAddress[]>('shopmate_addresses', []);
 		this.recentIds = read<number[]>('shopmate_recent', []);
+		this.compare = read<number[]>('shopmate_compare', []);
+		this.returns = read<ReturnRequest[]>('shopmate_returns', []);
+		this.giftCards = read<GiftCard[]>('shopmate_giftcards', []);
 		this.userReviews = read<Record<number, Review[]>>('shopmate_reviews', {});
 		const sessionEmail = read<string | null>('shopmate_session', null);
 		if (sessionEmail) {
@@ -152,7 +187,7 @@ class ShopState {
 	}
 
 	get cartTotal(): number {
-		return Math.max(0, this.cartSubtotal - this.cartDiscount + this.cartShipping);
+		return Math.max(0, this.cartSubtotal - this.cartDiscount + this.cartShipping - this.giftCardCredit);
 	}
 
 	get wishlistCount(): number {
@@ -221,7 +256,46 @@ class ShopState {
 	clearCart() {
 		this.cart = [];
 		this.promoCode = '';
+		this.giftCardCredit = 0;
 		write('shopmate_cart', this.cart);
+	}
+
+	/** Move a cart line to the wishlist ("Save for later"). */
+	moveLineToWishlist(id: number, variant?: string) {
+		const product = getProduct(id);
+		if (product && !this.wishlist.has(id)) {
+			this.wishlist.add(id);
+			this.wishlist = new Set(this.wishlist);
+			write('shopmate_wishlist', [...this.wishlist]);
+		}
+		this.removeFromCart(id, variant);
+		if (product) this.showToast(`${product.name} moved to wishlist`);
+	}
+
+	// ---- compare (max 4 products, side-by-side on /compare) ----
+	toggleCompare(id: number): boolean {
+		if (this.compare.includes(id)) {
+			this.compare = this.compare.filter((x) => x !== id);
+			write('shopmate_compare', this.compare);
+			return false;
+		}
+		if (this.compare.length >= 4) {
+			this.showToast('Compare holds up to 4 products');
+			return false;
+		}
+		this.compare = [id, ...this.compare];
+		write('shopmate_compare', this.compare);
+		this.showToast('Added to compare');
+		return true;
+	}
+
+	isCompared(id: number) {
+		return this.compare.includes(id);
+	}
+
+	clearCompare() {
+		this.compare = [];
+		write('shopmate_compare', this.compare);
 	}
 
 	// ---- wishlist ----
@@ -394,6 +468,91 @@ class ShopState {
 		return this.addresses.find((a) => a.isDefault) ?? this.addresses[0];
 	}
 
+	// ---- buy again (reorder a past order into the cart) ----
+	buyAgain(orderId: string): number {
+		const order = this.orders.find((o) => o.id === orderId);
+		if (!order) return 0;
+		let added = 0;
+		for (const item of order.items) {
+			const product = getProduct(item.id);
+			if (!product) continue;
+			this.addToCart(item.id, item.qty, { variant: item.variant, silent: true });
+			added += 1;
+		}
+		if (added > 0) {
+			this.showToast(`${added} item${added === 1 ? '' : 's'} added back to your cart`);
+			this.drawerOpen = true;
+		}
+		return added;
+	}
+
+	// ---- returns (demo: stored locally, shown on the order) ----
+	requestReturn(
+		orderId: string,
+		items: { productId: number; qty: number }[],
+		reason: string,
+		detail?: string
+	): ReturnRequest | null {
+		const order = this.orders.find((o) => o.id === orderId);
+		if (!order || items.length === 0) return null;
+		const req: ReturnRequest = {
+			id: 'RT' + Date.now().toString(36).toUpperCase(),
+			orderId,
+			items,
+			reason,
+			detail: detail?.trim() ? detail.trim() : undefined,
+			status: 'requested',
+			requestedAt: Date.now()
+		};
+		this.returns = [req, ...this.returns];
+		write('shopmate_returns', this.returns);
+		this.showToast('Return requested — we will email your label');
+		return req;
+	}
+
+	getReturn(orderId: string): ReturnRequest | undefined {
+		return this.returns.find((r) => r.orderId === orderId);
+	}
+
+	// ---- gift cards (demo: bought + redeemed on this device) ----
+	buyGiftCard(amount: number, toName: string, fromName: string, message?: string): GiftCard {
+		const code = 'SMGC-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+		const card: GiftCard = {
+			code,
+			amount,
+			balance: amount,
+			toName: toName.trim(),
+			fromName: fromName.trim(),
+			message: message?.trim() ? message.trim() : undefined,
+			createdAt: Date.now()
+		};
+		this.giftCards = [card, ...this.giftCards];
+		write('shopmate_giftcards', this.giftCards);
+		return card;
+	}
+
+	giftCardByCode(code: string): GiftCard | undefined {
+		return this.giftCards.find((g) => g.code.toUpperCase() === code.trim().toUpperCase());
+	}
+
+	/** Apply a gift card to the current cart; returns the credit applied (0 if invalid/empty). */
+	redeemGiftCard(code: string): number {
+		const card = this.giftCardByCode(code);
+		if (!card || card.balance <= 0) return 0;
+		const credit = Math.min(card.balance, Math.max(0, this.cartSubtotal - this.cartDiscount));
+		if (credit <= 0) return 0;
+		card.balance = Math.round((card.balance - credit) * 100) / 100;
+		this.giftCardCredit = Math.round((this.giftCardCredit + credit) * 100) / 100;
+		this.giftCards = [...this.giftCards];
+		write('shopmate_giftcards', this.giftCards);
+		this.showToast(`Gift card applied — ${formatPrice(credit)} off`);
+		return credit;
+	}
+
+	clearGiftCardCredit() {
+		this.giftCardCredit = 0;
+	}
+
 	// ---- orders ----
 	placeOrder(
 		address: Address,
@@ -423,7 +582,8 @@ class ShopState {
 			placedAt: Date.now(),
 			status: 'active',
 			notes: opts.notes?.trim() ? opts.notes.trim() : undefined,
-			giftWrap: giftWrap || undefined
+			giftWrap: giftWrap || undefined,
+			giftCardCredit: this.giftCardCredit > 0 ? this.giftCardCredit : undefined
 		};
 		this.orders = [order, ...this.orders];
 		write('shopmate_orders', this.orders);

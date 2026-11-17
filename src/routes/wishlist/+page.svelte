@@ -73,6 +73,11 @@
 							loading="lazy"
 							class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 						/>
+						{#if product.isNew}
+							<span class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-white uppercase shadow">
+								New
+							</span>
+						{/if}
 						<button
 							type="button"
 							aria-label="Remove {product.name} from wishlist"

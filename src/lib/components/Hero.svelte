@@ -41,21 +41,17 @@
 					{/each}
 				</div>
 				<p class="text-xs leading-snug font-medium text-stone-500 sm:text-sm">
-					Trusted by <span class="font-bold text-ink">10,000+</span> customers
+					Trusted by <span class="font-bold text-ink">10,000+</span> Happy Customers
 				</p>
 			</div>
 		</div>
 
-		<div class="relative flex items-center justify-center overflow-hidden px-6 py-6 sm:py-10 lg:py-8">
-			<!-- soft glow behind the product -->
-			<div class="absolute top-1/2 left-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60 blur-3xl sm:h-96 sm:w-96"></div>
-			<!-- soft ground shadow -->
-			<div class="absolute bottom-8 left-1/2 h-8 w-3/4 -translate-x-1/2 rounded-[100%] bg-stone-900/15 blur-xl sm:bottom-12"></div>
+		<div class="relative h-64 overflow-hidden sm:h-80 lg:h-auto lg:min-h-105">
 			<img
-				src="/hero-cutout.png"
+				src="/hero.webp"
 				alt="Olive travel backpack with cream wireless headphones and a small potted plant"
 				fetchpriority="high"
-				class="animate-float relative w-full max-w-105 drop-shadow-2xl sm:max-w-125"
+				class="absolute inset-0 h-full w-full object-cover"
 			/>
 		</div>
 	</div>

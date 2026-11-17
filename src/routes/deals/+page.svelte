@@ -23,19 +23,28 @@
 		}, 1400);
 	}
 
-	// Countdown to midnight tonight — the sale ends when the day does.
-	let remaining = $state('00:00:00');
+	// Countdown to the end of the current sale — next Sunday 23:59 local time.
+	// Boxes render "00" until onMount runs, so the prerender stays stable.
+	let parts = $state({ d: '00', h: '00', m: '00', s: '00' });
 	let timer: ReturnType<typeof setInterval> | undefined;
 
-	function tick() {
+	function nextSundayEnd(): Date {
 		const now = new Date();
-		const midnight = new Date(now);
-		midnight.setHours(24, 0, 0, 0);
-		const ms = Math.max(0, midnight.getTime() - now.getTime());
-		const h = Math.floor(ms / 3_600_000);
-		const m = Math.floor((ms % 3_600_000) / 60_000);
-		const s = Math.floor((ms % 60_000) / 1000);
-		remaining = [h, m, s].map((n) => String(n).padStart(2, '0')).join(':');
+		const end = new Date(now);
+		end.setHours(23, 59, 59, 999);
+		end.setDate(now.getDate() + ((7 - now.getDay()) % 7));
+		return end;
+	}
+
+	function tick() {
+		const ms = Math.max(0, nextSundayEnd().getTime() - Date.now());
+		const pad = (n: number) => String(n).padStart(2, '0');
+		parts = {
+			d: pad(Math.floor(ms / 86_400_000)),
+			h: pad(Math.floor(ms / 3_600_000) % 24),
+			m: pad(Math.floor(ms / 60_000) % 60),
+			s: pad(Math.floor(ms / 1000) % 60)
+		};
 	}
 
 	onMount(() => {
@@ -67,17 +76,19 @@
 		</p>
 		<h1 class="mt-4 text-3xl leading-tight font-extrabold tracking-tight text-ink sm:text-5xl">Up to 50% Off</h1>
 		<p class="mx-auto mt-3 max-w-md text-sm leading-relaxed text-stone-500 sm:text-base">
-			Big savings on our best sellers — but hurry, these deals end at midnight tonight.
+			Big savings on our best sellers — but hurry, these deals end Sunday night.
 		</p>
 
 		<!-- Countdown -->
-		<div class="mt-6 flex items-center justify-center gap-2" role="timer" aria-label="Time left in today's sale">
-			<Icon name="clock" class="h-5 w-5 text-olive" />
-			<span class="text-sm font-medium text-stone-500">Sale ends in</span>
-			<span class="rounded-lg bg-ink px-3 py-1.5 font-mono text-lg font-bold tracking-wider text-white tabular-nums">
-				{remaining}
-			</span>
+		<div class="mt-6 flex items-center justify-center gap-2 sm:gap-3" role="timer" aria-label="Time left in this week's sale">
+			{#each [{ value: parts.d, label: 'Days' }, { value: parts.h, label: 'Hours' }, { value: parts.m, label: 'Mins' }, { value: parts.s, label: 'Secs' }] as box (box.label)}
+				<div class="flex min-w-16 flex-col items-center rounded-xl bg-ink px-3 py-2.5 text-white shadow sm:min-w-20">
+					<span class="font-mono text-xl font-bold tabular-nums sm:text-2xl">{box.value}</span>
+					<span class="text-[10px] font-semibold tracking-widest text-white/70 uppercase">{box.label}</span>
+				</div>
+			{/each}
 		</div>
+		<p class="mt-3 text-xs font-medium text-stone-500">Sale ends Sunday at 11:59 PM</p>
 
 		<!-- Promo code -->
 		<div class="mx-auto mt-6 flex max-w-sm flex-col items-center gap-2 rounded-2xl border border-dashed border-olive/40 bg-white px-4 py-3 sm:flex-row sm:justify-between">
@@ -109,6 +120,11 @@
 					<span class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-xs font-extrabold text-white shadow">
 						-{discount(product)}%
 					</span>
+					{#if product.isNew}
+						<span class="absolute top-12 left-3 rounded-full bg-ink px-2.5 py-1 text-[11px] font-extrabold tracking-wide text-white uppercase shadow">
+							New
+						</span>
+					{/if}
 					<button
 						type="button"
 						aria-label={`Quick view ${product.name}`}

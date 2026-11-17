@@ -18,6 +18,10 @@ export type Product = {
 	rating: number;
 	reviews: number;
 	category: string;
+	/** Demo brand (used by the Brands page + shop brand filter). */
+	brand: string;
+	/** Flagged as a new arrival. */
+	isNew?: boolean;
 	stock: number;
 	desc: string;
 	/** AI-generated product photo in /static */
@@ -41,6 +45,7 @@ export const products: Product[] = [
 		rating: 4.5,
 		reviews: 128,
 		category: 'Electronics',
+		brand: 'Nova',
 		stock: 14,
 		desc: 'Stay connected on the go with a bright AMOLED display, heart-rate and sleep tracking, 7-day battery life and 50m water resistance.',
 		src: '/product-smartwatch.webp',
@@ -96,6 +101,7 @@ export const products: Product[] = [
 		rating: 4.7,
 		reviews: 98,
 		category: 'Electronics',
+		brand: 'Aural',
 		stock: 22,
 		desc: 'Immersive sound with active noise cancellation, 40-hour battery life, plush memory-foam earcups and Bluetooth 5.3 multipoint pairing.',
 		src: '/product-headphones.webp',
@@ -151,6 +157,7 @@ export const products: Product[] = [
 		rating: 4.6,
 		reviews: 156,
 		category: 'Accessories',
+		brand: 'Trekker',
 		stock: 30,
 		desc: 'A rugged 22L everyday carry backpack in water-resistant olive canvas, with a padded 15.6" laptop sleeve and anti-theft pocket.',
 		src: '/product-backpack.webp',
@@ -206,6 +213,8 @@ export const products: Product[] = [
 		rating: 4.4,
 		reviews: 78,
 		category: 'Sports',
+		brand: 'Stride',
+		isNew: true,
 		stock: 18,
 		desc: 'Featherlight mesh running shoes with responsive foam cushioning, breathable knit upper and grippy outsole for road and trail.',
 		src: '/product-shoes.webp',
@@ -261,6 +270,7 @@ export const products: Product[] = [
 		rating: 4.8,
 		reviews: 64,
 		category: 'Beauty',
+		brand: 'Elan',
 		stock: 25,
 		desc: 'An elegant eau de parfum with notes of bergamot, jasmine and warm sandalwood. Long-lasting, 50ml glass bottle with a silver cap.',
 		src: '/product-perfume.webp',
@@ -316,6 +326,8 @@ export const products: Product[] = [
 		rating: 4.6,
 		reviews: 87,
 		category: 'Fashion',
+		brand: 'ThreadCo',
+		isNew: true,
 		stock: 40,
 		desc: 'A soft, breathable everyday t-shirt in premium combed cotton with a regular fit. Pre-shrunk, tag-free and made to keep its shape wash after wash.',
 		src: '/product-tshirt.webp',
@@ -370,6 +382,8 @@ export const products: Product[] = [
 		rating: 4.5,
 		reviews: 52,
 		category: 'Home & Kitchen',
+		brand: 'Lumina',
+		isNew: true,
 		stock: 12,
 		desc: 'A warm, modern table lamp with a hand-glazed ceramic base and a cream linen shade. Soft ambient light for bedrooms and living rooms.',
 		src: '/product-lamp.webp',
