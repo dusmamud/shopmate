@@ -7,10 +7,11 @@
 
 	let added = $state(new Set<number>());
 
+	// No search: the 5 best sellers, same as the reference design (catalog order).
 	const filtered = $derived(
 		shop.search.trim()
 			? products.filter((p) => p.name.toLowerCase().includes(shop.search.trim().toLowerCase()))
-			: products
+			: products.slice(0, 5)
 	);
 
 	function addToCart(id: number) {

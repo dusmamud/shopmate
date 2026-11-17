@@ -91,7 +91,7 @@
 		<p class="mt-3 text-xs font-medium text-stone-500">Sale ends Sunday at 11:59 PM</p>
 
 		<!-- Promo code -->
-		<div class="mx-auto mt-6 flex max-w-sm flex-col items-center gap-2 rounded-2xl border border-dashed border-olive/40 bg-white px-4 py-3 sm:flex-row sm:justify-between">
+		<div class="mx-auto mt-6 flex max-w-md flex-col items-center gap-2 rounded-2xl border border-dashed border-olive/40 bg-white px-4 py-3 sm:flex-row sm:justify-between">
 			<p class="text-sm text-stone-600">
 				Use code <span class="font-mono text-base font-extrabold tracking-wider text-olive">WELCOME10</span> for 10% off at checkout
 			</p>
