@@ -43,7 +43,7 @@
 		</div>
 
 		<nav aria-label="Quick links">
-			<h3 class="text-sm font-bold tracking-wide text-ink">Quick Links</h3>
+			<h2 class="text-sm font-bold tracking-wide text-ink">Quick Links</h2>
 			<ul class="mt-4 space-y-2.5 text-sm text-stone-600">
 				<li><a class="hover:text-olive" href="/">Home</a></li>
 				<li><a class="hover:text-olive" href="/shop">Shop</a></li>
@@ -60,7 +60,7 @@
 		</nav>
 
 		<nav aria-label="Customer service">
-			<h3 class="text-sm font-bold tracking-wide text-ink">Customer Service</h3>
+			<h2 class="text-sm font-bold tracking-wide text-ink">Customer Service</h2>
 			<ul class="mt-4 space-y-2.5 text-sm text-stone-600">
 				<li><a class="hover:text-olive" href="/track-order">Track Order</a></li>
 				<li><a class="hover:text-olive" href="/returns-policy">Returns &amp; Refunds</a></li>
@@ -76,7 +76,7 @@
 		</nav>
 
 		<div>
-			<h3 class="text-sm font-bold tracking-wide text-ink">Subscribe to our newsletter</h3>
+			<h2 class="text-sm font-bold tracking-wide text-ink">Subscribe to our newsletter</h2>
 			<p class="mt-4 text-sm leading-relaxed text-stone-600">
 				Get the latest updates on new products and upcoming sales.
 			</p>

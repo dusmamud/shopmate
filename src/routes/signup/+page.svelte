@@ -33,7 +33,7 @@
 			: password.length < 6
 				? 'text-red-600'
 				: password.length < 9
-					? 'text-amber-600'
+					? 'text-amber-700'
 					: 'text-olive'
 	);
 
@@ -73,7 +73,7 @@
 				<Icon name="user" class="h-6 w-6" />
 			</div>
 			<h1 class="mt-4 text-xl font-extrabold tracking-tight text-ink sm:text-2xl">Create your account</h1>
-			<p class="mt-1 text-sm text-stone-500">Join ShopMate for faster checkout, order tracking and saved favourites.</p>
+			<p class="mt-1 text-sm text-stone-600">Join ShopMate for faster checkout, order tracking and saved favourites.</p>
 
 			{#if serverError}
 				<p class="mt-5 flex items-start gap-2 rounded-lg bg-red-50 px-3.5 py-3 text-sm text-red-700" role="alert">
@@ -194,7 +194,7 @@
 			</p>
 		</div>
 
-		<div class="mt-5 flex items-center justify-center gap-6 text-xs text-stone-500">
+		<div class="mt-5 flex items-center justify-center gap-6 text-xs text-stone-600">
 			<span class="flex items-center gap-1.5"><Icon name="shield" class="h-4 w-4 text-olive" /> Secure sign up</span>
 			<span class="flex items-center gap-1.5"><Icon name="lock" class="h-4 w-4 text-olive" /> Your data stays on this device</span>
 		</div>

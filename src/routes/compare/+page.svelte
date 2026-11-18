@@ -24,7 +24,7 @@
 
 	function stockLabel(p: Product) {
 		if (p.stock <= 0) return { text: 'Out of stock', cls: 'text-red-600' };
-		if (p.stock <= 5) return { text: `Only ${p.stock} left`, cls: 'text-amber-600' };
+		if (p.stock <= 5) return { text: `Only ${p.stock} left`, cls: 'text-amber-700' };
 		return { text: 'In stock', cls: 'text-green-700' };
 	}
 </script>
@@ -86,7 +86,7 @@
 				<Icon name="sliders" class="h-8 w-8" />
 			</div>
 			<h2 class="mt-4 text-lg font-bold text-ink">Nothing to compare yet</h2>
-			<p class="mx-auto mt-1 max-w-sm text-sm text-stone-500">
+			<p class="mx-auto mt-1 max-w-sm text-sm text-stone-600">
 				Use the Compare button on any product card or product page to add products here — up to 4
 				at a time.
 			</p>
