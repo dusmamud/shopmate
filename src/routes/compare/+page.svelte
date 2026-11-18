@@ -35,6 +35,22 @@
 		name="description"
 		content="Compare ShopMate products side by side — price, ratings, brand, stock and key specs — and pick the right one."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/compare" />
+	<meta property="og:title" content="Compare Products — ShopMate" />
+	<meta
+		property="og:description"
+		content="Compare ShopMate products side by side — price, ratings, brand, stock and key specs — and pick the right one."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/compare" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Compare Products — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="Compare ShopMate products side by side — price, ratings, brand, stock and key specs — and pick the right one."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -43,7 +59,7 @@
 		<div>
 			<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
 				Compare Products
-				{#if compared.length > 0}<span class="text-stone-400">({compared.length})</span>{/if}
+				{#if compared.length > 0}<span class="text-stone-500">({compared.length})</span>{/if}
 			</h1>
 			<p class="mt-1 text-sm text-stone-500">
 				Side by side, so you can pick the one that fits best. Add up to 4 products from any product
@@ -92,8 +108,13 @@
 						<a href="/product/{product.id}" aria-label={product.name} class="block h-full w-full">
 							<img
 								src={product.src}
+								srcset={product.src.includes('backpack') || product.src.includes('headphones')
+									? `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src.replace('.webp', '-1200.webp')} 1200w, ${product.src} 1600w`
+									: `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src} ${product.src.includes('lamp') || product.src.includes('tshirt') ? 1120 : 912}w`}
+								sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 300px"
 								alt={product.name}
 								loading="lazy"
+								decoding="async"
 								class="h-full w-full object-cover"
 							/>
 						</a>
@@ -120,7 +141,7 @@
 						</h2>
 						<p class="mt-2 flex items-baseline gap-2">
 							<span class="text-lg font-extrabold text-ink">{formatPrice(product.price)}</span>
-							<span class="text-sm text-stone-400 line-through"
+							<span class="text-sm text-stone-500 line-through"
 								>{formatPrice(product.oldPrice)}</span
 							>
 						</p>
@@ -175,7 +196,7 @@
 				</article>
 			{/each}
 		</div>
-		<p class="mt-6 text-center text-xs text-stone-400">
+		<p class="mt-6 text-center text-xs text-stone-500">
 			Prices include all taxes. Free shipping on orders over $50, free returns within 30 days.
 		</p>
 	{/if}

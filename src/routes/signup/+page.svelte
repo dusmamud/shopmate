@@ -59,6 +59,11 @@
 
 <svelte:head>
 	<title>Create Account — ShopMate</title>
+	<meta
+		name="description"
+		content="Create your free ShopMate account today for faster checkout, order tracking and saved favourites. Demo store — accounts are saved only on this device."
+	/>
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <section class="bg-cream px-4 py-12 sm:py-16">
@@ -184,7 +189,7 @@
 				<a href="/login" class="font-semibold text-olive hover:text-olive-dark">Log in</a>
 			</p>
 
-			<p class="mt-4 rounded-lg bg-cream px-3 py-2 text-center text-xs text-stone-500">
+			<p class="mt-4 rounded-lg bg-cream px-3 py-2 text-center text-xs text-stone-600">
 				Demo store — accounts are saved only on this device.
 			</p>
 		</div>

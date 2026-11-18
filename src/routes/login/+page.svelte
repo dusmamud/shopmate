@@ -30,7 +30,12 @@
 </script>
 
 <svelte:head>
-	<title>Log in — ShopMate</title>
+	<title>Log in to ShopMate — Orders, Wishlist &amp; Account</title>
+	<meta
+		name="description"
+		content="Log in securely to your ShopMate account to track orders, check out faster and manage your wishlist. Demo store — accounts are saved only on this device."
+	/>
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <section class="bg-cream px-4 py-12 sm:py-16">
@@ -103,7 +108,7 @@
 				<a href="/signup" class="font-semibold text-olive hover:text-olive-dark">Sign up</a>
 			</p>
 
-			<p class="mt-4 rounded-lg bg-cream px-3 py-2 text-center text-xs text-stone-500">
+			<p class="mt-4 rounded-lg bg-cream px-3 py-2 text-center text-xs text-stone-600">
 				Demo store — accounts are saved only on this device.
 			</p>
 		</div>

@@ -140,7 +140,7 @@
 							onclick={() => pickSuggestion(p.id)}
 							class="flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-cream"
 						>
-							<img src={p.src} alt="" class="h-11 w-11 shrink-0 rounded-lg object-cover" />
+							<img src={p.src} srcset="{p.src.replace('.webp', '-400.webp')} 400w" sizes="44px" alt="" loading="lazy" decoding="async" class="h-11 w-11 shrink-0 rounded-lg object-cover" />
 							<span class="min-w-0 flex-1">
 								<span class="block truncate text-sm font-semibold text-ink">{p.name}</span>
 								<span class="block text-xs text-stone-500">{p.category}</span>

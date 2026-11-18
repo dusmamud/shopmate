@@ -113,6 +113,11 @@
 
 <svelte:head>
 	<title>My Account — ShopMate</title>
+	<meta
+		name="description"
+		content="Your ShopMate account — edit your profile, change your password, manage saved addresses and view recent orders. Log in to see your profile and saved items."
+	/>
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -139,7 +144,7 @@
 					Create Account
 				</a>
 			</div>
-			<p class="mt-5 text-xs text-stone-400">Demo store — accounts are saved only on this device.</p>
+			<p class="mt-5 text-xs text-stone-500">Demo store — accounts are saved only on this device.</p>
 		</div>
 	{:else}
 		<h1 class="text-xl font-extrabold tracking-tight text-ink sm:text-2xl">My Account</h1>
@@ -153,7 +158,7 @@
 				<div>
 					<p class="text-lg font-bold text-ink">{shop.user.name}</p>
 					<p class="text-sm text-stone-500">{shop.user.email}</p>
-					<p class="mt-1 flex items-center gap-1.5 text-xs text-stone-400">
+					<p class="mt-1 flex items-center gap-1.5 text-xs text-stone-500">
 						<Icon name="shield" class="h-3.5 w-3.5" />
 						Demo account — your details are saved only on this device
 					</p>
@@ -300,7 +305,7 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="mt-4 rounded-xl bg-cream px-4 py-3 text-sm text-stone-500">
+				<p class="mt-4 rounded-xl bg-cream px-4 py-3 text-sm text-stone-600">
 					No saved addresses yet — add one below, or tick "Save this address" at checkout.
 				</p>
 			{/if}
@@ -408,7 +413,7 @@
 				</a>
 			</div>
 			{#if recentOrders.length === 0}
-				<p class="mt-4 rounded-2xl border border-dashed border-line bg-cream px-6 py-10 text-center text-sm text-stone-500">
+				<p class="mt-4 rounded-2xl border border-dashed border-line bg-cream px-6 py-10 text-center text-sm text-stone-600">
 					You haven't placed any orders yet.
 					<a href="/shop" class="font-semibold text-olive hover:text-olive-dark">Start shopping</a>
 				</p>

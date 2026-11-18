@@ -17,6 +17,11 @@
 
 <svelte:head>
 	<title>Order Confirmed — ShopMate</title>
+	<meta
+		name="description"
+		content="Your ShopMate order is confirmed — a confirmation email has been sent, with estimated delivery and an order summary. View or download your tax invoice."
+	/>
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
@@ -63,7 +68,7 @@
 				{#each order.items as item (item.id)}
 					<li class="flex items-center gap-4 px-5 py-4">
 						<a href="/product/{item.id}" class="block h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#f6f1e7]">
-							<img src={item.src} alt={item.name} class="h-full w-full object-cover" />
+							<img src={item.src} srcset="{item.src.replace('.webp', '-400.webp')} 400w" sizes="64px" alt={item.name} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 						</a>
 						<span class="min-w-0 flex-1">
 							<span class="block truncate text-sm font-semibold text-ink">{item.name}</span>

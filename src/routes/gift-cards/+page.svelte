@@ -69,6 +69,22 @@
 		name="description"
 		content="Give a ShopMate gift card — choose an amount, add a message, and check any gift card balance. Demo only, stored on this device."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/gift-cards" />
+	<meta property="og:title" content="Gift Cards — ShopMate" />
+	<meta
+		property="og:description"
+		content="Give a ShopMate gift card — choose an amount, add a message, and check any gift card balance. Demo only, stored on this device."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/gift-cards" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Gift Cards — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="Give a ShopMate gift card — choose an amount, add a message, and check any gift card balance. Demo only, stored on this device."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -200,7 +216,7 @@
 					</div>
 					<div>
 						<label for="gc-message" class="mb-1 block text-sm font-semibold text-ink"
-							>Message <span class="font-normal text-stone-400">(optional)</span></label
+							>Message <span class="font-normal text-stone-500">(optional)</span></label
 						>
 						<textarea
 							id="gc-message"
@@ -227,7 +243,7 @@
 					<Icon name="credit-card" class="h-4 w-4" />
 					Purchase gift card — {formatPrice(effectiveAmount())}
 				</button>
-				<p class="mt-2 text-center text-xs text-stone-400">
+				<p class="mt-2 text-center text-xs text-stone-500">
 					Demo checkout — no real payment is taken. The card is stored in this browser only.
 				</p>
 			{/if}

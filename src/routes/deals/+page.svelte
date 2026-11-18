@@ -65,6 +65,26 @@
 
 <svelte:head>
 	<title>Deals — Up to 50% Off — ShopMate</title>
+	<meta
+		name="description"
+		content="ShopMate deals — up to 50% off best sellers, with a live countdown to Sunday 11:59 PM. Use code WELCOME10 for an extra 10% off at checkout on every deal."
+	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/deals" />
+	<meta property="og:title" content="Deals — Up to 50% Off — ShopMate" />
+	<meta
+		property="og:description"
+		content="ShopMate deals — up to 50% off best sellers, with a live countdown to Sunday 11:59 PM. Use code WELCOME10 for an extra 10% off at checkout on every deal."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/deals" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Deals — Up to 50% Off — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate deals — up to 50% off best sellers, with a live countdown to Sunday 11:59 PM. Use code WELCOME10 for an extra 10% off at checkout on every deal."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -113,8 +133,13 @@
 				<div class="relative aspect-square overflow-hidden bg-[#f6f1e7]">
 					<img
 						src={product.src}
+						srcset={product.src.includes('backpack') || product.src.includes('headphones')
+							? `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src.replace('.webp', '-1200.webp')} 1200w, ${product.src} 1600w`
+							: `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src} ${product.src.includes('lamp') || product.src.includes('tshirt') ? 1120 : 912}w`}
+						sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 240px"
 						alt={product.name}
 						loading="lazy"
+						decoding="async"
 						class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 					/>
 					<span class="absolute top-3 left-3 rounded-full bg-olive px-2.5 py-1 text-xs font-extrabold text-white shadow">
@@ -155,7 +180,7 @@
 					</p>
 					<p class="mt-2 flex items-baseline gap-2">
 						<span class="text-base font-extrabold text-ink">{formatPrice(product.price)}</span>
-						<span class="text-xs text-stone-400 line-through">{formatPrice(product.oldPrice)}</span>
+						<span class="text-xs text-stone-500 line-through">{formatPrice(product.oldPrice)}</span>
 					</p>
 					<button
 						type="button"
@@ -172,7 +197,7 @@
 		{/each}
 	</div>
 
-	<p class="mt-6 text-center text-xs text-stone-400">
+	<p class="mt-6 text-center text-xs text-stone-500">
 		Discounts shown against the original price. Promo code WELCOME10 gives an extra 10% off at checkout.
 	</p>
 </section>

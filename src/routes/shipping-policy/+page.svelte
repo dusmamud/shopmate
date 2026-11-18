@@ -31,13 +31,22 @@
 		name="description"
 		content="ShopMate shipping policy: free shipping on orders over $50 (otherwise $4.99), delivery in 3–4 business days, and order tracking by ID."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/shipping-policy" />
 	<meta property="og:title" content="Shipping Policy — ShopMate" />
 	<meta
 		property="og:description"
-		content="Free shipping over $50, $4.99 flat otherwise, delivery in 3–4 business days, and tracking for every order."
+		content="ShopMate shipping policy: free shipping on orders over $50 (otherwise $4.99), delivery in 3–4 business days, and order tracking by ID."
 	/>
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://shopmates.pages.dev/hero.webp" />
+	<meta property="og:url" content="https://shopmates.pages.dev/shipping-policy" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Shipping Policy — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate shipping policy: free shipping on orders over $50 (otherwise $4.99), delivery in 3–4 business days, and order tracking by ID."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">

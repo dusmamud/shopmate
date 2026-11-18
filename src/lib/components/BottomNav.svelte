@@ -59,7 +59,7 @@
 	<a
 		href={shop.user ? '/account' : '/login'}
 		class={itemCls(isActive('/account') || isActive('/login'))}
-		aria-label={shop.user ? `Account, signed in as ${shop.user.name}` : 'Login or sign up'}
+		aria-label={shop.user ? `Account, signed in as ${shop.user.name}` : 'Account — Login or sign up'}
 	>
 		<Icon name="user" class="h-5 w-5" />
 		Account

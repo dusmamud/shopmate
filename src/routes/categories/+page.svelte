@@ -7,6 +7,26 @@
 
 <svelte:head>
 	<title>Shop by Category — ShopMate</title>
+	<meta
+		name="description"
+		content="Browse ShopMate categories — Electronics, Fashion, Home & Kitchen, Beauty, Sports and Accessories — and pick one to see its matching products."
+	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/categories" />
+	<meta property="og:title" content="Shop by Category — ShopMate" />
+	<meta
+		property="og:description"
+		content="Browse ShopMate categories — Electronics, Fashion, Home & Kitchen, Beauty, Sports and Accessories — and pick one to see its matching products."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/categories" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Shop by Category — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="Browse ShopMate categories — Electronics, Fashion, Home & Kitchen, Beauty, Sports and Accessories — and pick one to see its matching products."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -25,6 +45,9 @@
 						src={cat.photo}
 						alt={cat.name}
 						loading="lazy"
+						decoding="async"
+						width="456"
+						height="456"
 						class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 					/>
 					<div class="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-black/0"></div>

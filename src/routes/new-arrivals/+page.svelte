@@ -27,6 +27,22 @@
 		name="description"
 		content="The newest products at ShopMate — fresh drops across electronics, fashion, home and more."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/new-arrivals" />
+	<meta property="og:title" content="New Arrivals — ShopMate" />
+	<meta
+		property="og:description"
+		content="The newest products at ShopMate — fresh drops across electronics, fashion, home and more."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/new-arrivals" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="New Arrivals — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="The newest products at ShopMate — fresh drops across electronics, fashion, home and more."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -61,8 +77,13 @@
 						<a href="/product/{product.id}" aria-label={product.name} class="block h-full w-full">
 							<img
 								src={product.src}
+								srcset={product.src.includes('backpack') || product.src.includes('headphones')
+									? `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src.replace('.webp', '-1200.webp')} 1200w, ${product.src} 1600w`
+									: `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src} ${product.src.includes('lamp') || product.src.includes('tshirt') ? 1120 : 912}w`}
+								sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 240px"
 								alt={product.name}
 								loading="lazy"
+								decoding="async"
 								class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 							/>
 						</a>
@@ -103,7 +124,7 @@
 						</p>
 						<p class="mt-2 flex items-baseline gap-2">
 							<span class="text-base font-extrabold text-ink">{formatPrice(product.price)}</span>
-							<span class="text-xs text-stone-400 line-through">{formatPrice(product.oldPrice)}</span>
+							<span class="text-xs text-stone-500 line-through">{formatPrice(product.oldPrice)}</span>
 						</p>
 						<button
 							type="button"

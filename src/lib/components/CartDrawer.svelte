@@ -124,7 +124,7 @@
 								class="block h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#f6f1e7]"
 								aria-label={p.name}
 							>
-								<img src={p.src} alt={p.name} class="h-full w-full object-cover" />
+								<img src={p.src} srcset="{p.src.replace('.webp', '-400.webp')} 400w" sizes="80px" alt={p.name} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 							</a>
 							<div class="min-w-0 flex-1">
 								<div class="flex items-start justify-between gap-2">
@@ -186,7 +186,7 @@
 						<span class="text-stone-500">Subtotal</span>
 						<span class="text-base font-extrabold text-ink">{formatPrice(shop.cartSubtotal)}</span>
 					</div>
-					<p class="mt-1 text-xs text-stone-400">Shipping &amp; taxes calculated at checkout.</p>
+					<p class="mt-1 text-xs text-stone-500">Shipping &amp; taxes calculated at checkout.</p>
 					<div class="mt-4 grid grid-cols-2 gap-3">
 						<a
 							href="/cart"

@@ -34,17 +34,17 @@
 				</span>
 				<span class="text-xl font-extrabold tracking-tight">ShopMate</span>
 			</a>
-			<p class="mt-4 max-w-xs text-sm leading-relaxed text-stone-500">
+			<p class="mt-4 max-w-xs text-sm leading-relaxed text-stone-600">
 				Your one-stop shop for quality products at the best prices.
 			</p>
-			<p class="mt-4 flex items-center gap-2 text-sm text-stone-500">
+			<p class="mt-4 flex items-center gap-2 text-sm text-stone-600">
 				<Icon name="mail" class="h-4 w-4 text-olive" /> hello@shopmate.store
 			</p>
 		</div>
 
 		<nav aria-label="Quick links">
 			<h3 class="text-sm font-bold tracking-wide text-ink">Quick Links</h3>
-			<ul class="mt-4 space-y-2.5 text-sm text-stone-500">
+			<ul class="mt-4 space-y-2.5 text-sm text-stone-600">
 				<li><a class="hover:text-olive" href="/">Home</a></li>
 				<li><a class="hover:text-olive" href="/shop">Shop</a></li>
 				<li><a class="hover:text-olive" href="/categories">Categories</a></li>
@@ -61,7 +61,7 @@
 
 		<nav aria-label="Customer service">
 			<h3 class="text-sm font-bold tracking-wide text-ink">Customer Service</h3>
-			<ul class="mt-4 space-y-2.5 text-sm text-stone-500">
+			<ul class="mt-4 space-y-2.5 text-sm text-stone-600">
 				<li><a class="hover:text-olive" href="/track-order">Track Order</a></li>
 				<li><a class="hover:text-olive" href="/returns-policy">Returns &amp; Refunds</a></li>
 				<li><a class="hover:text-olive" href="/shipping-policy">Shipping Policy</a></li>
@@ -77,7 +77,7 @@
 
 		<div>
 			<h3 class="text-sm font-bold tracking-wide text-ink">Subscribe to our newsletter</h3>
-			<p class="mt-4 text-sm leading-relaxed text-stone-500">
+			<p class="mt-4 text-sm leading-relaxed text-stone-600">
 				Get the latest updates on new products and upcoming sales.
 			</p>
 			{#if subscribed}
@@ -122,7 +122,7 @@
 	</div>
 
 	<div class="border-t border-line">
-		<div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-stone-500 sm:flex-row sm:px-6 lg:px-8">
+		<div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-stone-600 sm:flex-row sm:px-6 lg:px-8">
 			<p>© 2026 ShopMate. All rights reserved.</p>
 			<p class="flex items-center gap-1.5">
 				<Icon name="shield" class="h-4 w-4 text-olive" /> 100% secure payment · 30-day returns

@@ -22,6 +22,9 @@
 						src={cat.photo}
 						alt={cat.name}
 						loading="lazy"
+						decoding="async"
+						width="456"
+						height="456"
 						class="h-full w-full object-cover transition duration-300 group-hover:scale-110"
 					/>
 				</span>

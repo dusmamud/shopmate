@@ -36,7 +36,7 @@
 	</div>
 
 	{#if filtered.length === 0}
-		<p class="mt-8 rounded-2xl border border-dashed border-line bg-cream px-6 py-10 text-center text-sm text-stone-500">
+		<p class="mt-8 rounded-2xl border border-dashed border-line bg-cream px-6 py-10 text-center text-sm text-stone-600">
 			No products match “{shop.search.trim()}”. Try another search.
 		</p>
 	{:else}
@@ -46,8 +46,13 @@
 					<div class="relative aspect-square overflow-hidden bg-[#f6f1e7]">
 						<img
 							src={product.src}
+							srcset={product.src.includes('backpack') || product.src.includes('headphones')
+								? `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src.replace('.webp', '-1200.webp')} 1200w, ${product.src} 1600w`
+								: `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src} ${product.src.includes('lamp') || product.src.includes('tshirt') ? 1120 : 912}w`}
+							sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 240px"
 							alt={product.name}
 							loading="lazy"
+							decoding="async"
 							class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 						/>
 						{#if product.isNew}
@@ -90,7 +95,7 @@
 						</p>
 						<p class="mt-2 flex items-baseline gap-2">
 							<span class="text-base font-extrabold text-ink">${product.price.toFixed(2)}</span>
-							<span class="text-xs text-stone-400 line-through">${product.oldPrice.toFixed(2)}</span>
+							<span class="text-xs text-stone-500 line-through">${product.oldPrice.toFixed(2)}</span>
 						</p>
 						<button
 							type="button"

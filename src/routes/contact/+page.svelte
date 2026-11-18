@@ -39,6 +39,26 @@
 
 <svelte:head>
 	<title>Contact Us — ShopMate</title>
+	<meta
+		name="description"
+		content="Contact ShopMate — email hello@shopmate.store, call +1 (555) 123-4567, or visit 123 Market Street, Austin. We usually reply within one business day."
+	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/contact" />
+	<meta property="og:title" content="Contact Us — ShopMate" />
+	<meta
+		property="og:description"
+		content="Contact ShopMate — email hello@shopmate.store, call +1 (555) 123-4567, or visit 123 Market Street, Austin. We usually reply within one business day."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/contact" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Contact Us — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="Contact ShopMate — email hello@shopmate.store, call +1 (555) 123-4567, or visit 123 Market Street, Austin. We usually reply within one business day."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -63,7 +83,7 @@
 					</div>
 				</div>
 			{/each}
-			<p class="rounded-2xl bg-cream px-5 py-4 text-xs leading-relaxed text-stone-500">
+			<p class="rounded-2xl bg-cream px-5 py-4 text-xs leading-relaxed text-stone-600">
 				We usually reply within one business day. For order tracking, you can also use
 				<a href="/track-order" class="font-semibold text-olive hover:text-olive-dark">Track Order</a>
 				with your order ID.
@@ -157,7 +177,7 @@
 					>
 						Send Message <Icon name="arrow-right" class="h-4 w-4" />
 					</button>
-					<p class="text-xs text-stone-400">Demo form — no email is actually sent.</p>
+					<p class="text-xs text-stone-500">Demo form — no email is actually sent.</p>
 				</form>
 			{/if}
 		</div>

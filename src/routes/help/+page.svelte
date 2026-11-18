@@ -47,6 +47,22 @@
 		name="description"
 		content="ShopMate Help Center: track your order, check out as a guest, pay by COD, card or UPI, use promo codes, and cancel or return within 30 days."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/help" />
+	<meta property="og:title" content="Help Center — ShopMate" />
+	<meta
+		property="og:description"
+		content="ShopMate Help Center: track your order, check out as a guest, pay by COD, card or UPI, use promo codes, and cancel or return within 30 days."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/help" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Help Center — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate Help Center: track your order, check out as a guest, pay by COD, card or UPI, use promo codes, and cancel or return within 30 days."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 	{@html `<script type="application/ld+json">${faqJsonLd}</script>`}
 </svelte:head>
 

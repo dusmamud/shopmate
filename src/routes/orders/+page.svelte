@@ -43,6 +43,11 @@
 
 <svelte:head>
 	<title>My Orders — ShopMate</title>
+	<meta
+		name="description"
+		content="View your ShopMate orders — placed orders show here with live tracking, totals and return options. Log in to see your order history on this device."
+	/>
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -99,7 +104,11 @@
 								{#each order.items.slice(0, 4) as item}
 									<img
 										src={item.src}
+										srcset="{item.src.replace('.webp', '-400.webp')} 400w"
+										sizes="44px"
 										alt={item.name}
+										loading="lazy"
+										decoding="async"
 										class="h-11 w-11 rounded-full border-2 border-white object-cover shadow-sm"
 									/>
 								{/each}
@@ -113,7 +122,7 @@
 							<div class="h-2 overflow-hidden rounded-full bg-stone-200">
 								<div class="h-full rounded-full {order.status === 'cancelled' ? 'bg-red-400' : 'bg-olive'} transition-all" style="width: {order.status === 'cancelled' ? 100 : progress(order)}%"></div>
 							</div>
-							<div class="mt-1.5 flex justify-between text-[11px] font-medium text-stone-400">
+							<div class="mt-1.5 flex justify-between text-[11px] font-medium text-stone-500">
 								<span class={step >= 0 && order.status !== 'cancelled' ? 'text-olive' : ''}>Placed</span>
 								<span class={step >= 2 && order.status !== 'cancelled' ? 'text-olive' : ''}>Shipped</span>
 								<span class={step >= 4 && order.status !== 'cancelled' ? 'text-olive' : ''}>Delivered</span>

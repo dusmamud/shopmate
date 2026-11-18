@@ -33,18 +33,27 @@
 </script>
 
 <svelte:head>
-	<title>About Us — ShopMate</title>
+	<title>About ShopMate — Honest Prices, Quality Products</title>
 	<meta
 		name="description"
 		content="ShopMate is a small demo store with a simple idea: quality products, honest prices, fast delivery and easy 30-day returns."
 	/>
-	<meta property="og:title" content="About Us — ShopMate" />
+	<link rel="canonical" href="https://shopmates.pages.dev/about" />
+	<meta property="og:title" content="About ShopMate — Honest Prices, Quality Products" />
 	<meta
 		property="og:description"
-		content="Quality products at honest prices, fast delivery and easy 30-day returns. That is the whole idea behind ShopMate."
+		content="ShopMate is a small demo store with a simple idea: quality products, honest prices, fast delivery and easy 30-day returns."
 	/>
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://shopmates.pages.dev/hero.webp" />
+	<meta property="og:url" content="https://shopmates.pages.dev/about" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="About ShopMate — Honest Prices, Quality Products" />
+	<meta
+		name="twitter:description"
+		content="ShopMate is a small demo store with a simple idea: quality products, honest prices, fast delivery and easy 30-day returns."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

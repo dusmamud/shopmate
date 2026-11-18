@@ -45,9 +45,10 @@
 					'@context': 'https://schema.org',
 					'@type': 'Product',
 					name: product.name,
-					image: 'https://shopmates.pages.dev' + product.src,
+					image: product.images.map((src) => 'https://shopmates.pages.dev' + src),
 					description: product.desc,
-					brand: { '@type': 'Brand', name: 'ShopMate' },
+					brand: { '@type': 'Brand', name: product.brand },
+					sku: 'SM-' + product.id,
 					aggregateRating: {
 						'@type': 'AggregateRating',
 						ratingValue: product.rating,
@@ -55,10 +56,90 @@
 					},
 					offers: {
 						'@type': 'Offer',
+						url: 'https://shopmates.pages.dev/product/' + product.id,
 						priceCurrency: 'USD',
 						price: product.price,
-						availability: 'https://schema.org/InStock'
+						availability: 'https://schema.org/InStock',
+						shippingDetails: [
+							{
+								'@type': 'OfferShippingDetails',
+								shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'USD' },
+								eligibleTransactionVolume: {
+									'@type': 'PriceSpecification',
+									priceCurrency: 'USD',
+									minPrice: 50
+								},
+								deliveryTime: {
+									'@type': 'ShippingDeliveryTime',
+									handlingTime: {
+										'@type': 'QuantitativeValue',
+										minValue: 0,
+										maxValue: 1,
+										unitCode: 'DAY'
+									},
+									transitTime: {
+										'@type': 'QuantitativeValue',
+										minValue: 2,
+										maxValue: 3,
+										unitCode: 'DAY'
+									}
+								}
+							},
+							{
+								'@type': 'OfferShippingDetails',
+								shippingRate: { '@type': 'MonetaryAmount', value: 4.99, currency: 'USD' },
+								deliveryTime: {
+									'@type': 'ShippingDeliveryTime',
+									handlingTime: {
+										'@type': 'QuantitativeValue',
+										minValue: 0,
+										maxValue: 1,
+										unitCode: 'DAY'
+									},
+									transitTime: {
+										'@type': 'QuantitativeValue',
+										minValue: 2,
+										maxValue: 3,
+										unitCode: 'DAY'
+									}
+								}
+							}
+						],
+						hasMerchantReturnPolicy: {
+							'@id': 'https://shopmates.pages.dev/#return-policy'
+						}
 					}
+				})
+			: ''
+	);
+
+	const breadcrumbLd = $derived(
+		product
+			? JSON.stringify({
+					'@context': 'https://schema.org',
+					'@type': 'BreadcrumbList',
+					itemListElement: [
+						{
+							'@type': 'ListItem',
+							position: 1,
+							name: 'Home',
+							item: 'https://shopmates.pages.dev/'
+						},
+						{
+							'@type': 'ListItem',
+							position: 2,
+							name: product.category,
+							item:
+								'https://shopmates.pages.dev/shop?category=' +
+								encodeURIComponent(product.category)
+						},
+						{
+							'@type': 'ListItem',
+							position: 3,
+							name: product.name,
+							item: 'https://shopmates.pages.dev/product/' + product.id
+						}
+					]
 				})
 			: ''
 	);
@@ -108,6 +189,26 @@
 		product ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) : 0
 	);
 	const images = $derived(product?.images ?? []);
+	const gallerySrc = $derived(images[activeImg] ?? product?.src ?? '');
+	/** Responsive srcset for the active gallery image (variants generated per file). */
+	const gallerySrcset = $derived.by(() => {
+		const src = gallerySrc;
+		if (!src) return '';
+		const w400 = src.replace('.webp', '-400.webp');
+		const w800 = src.replace('.webp', '-800.webp');
+		if (src.includes('-2.webp')) {
+			const w =
+				src.includes('backpack') || src.includes('headphones') || src.includes('smartwatch')
+					? 912
+					: 800;
+			return `${w400} 400w, ${w800} 800w, ${src} ${w}w`;
+		}
+		if (src.includes('backpack') || src.includes('headphones')) {
+			return `${w400} 400w, ${w800} 800w, ${src.replace('.webp', '-1200.webp')} 1200w, ${src} 1600w`;
+		}
+		const w = src.includes('lamp') || src.includes('tshirt') ? 1120 : 912;
+		return `${w400} 400w, ${w800} 800w, ${src} ${w}w`;
+	});
 	const allReviews = $derived(product ? shop.getReviews(product.id) : []);
 	const sortedReviews = $derived.by(() => {
 		let list = [...allReviews];
@@ -296,13 +397,19 @@
 <svelte:head>
 	<title>{product ? `${product.name} — ShopMate` : 'Product not found — ShopMate'}</title>
 	{#if product}
+		<link rel="canonical" href={'https://shopmates.pages.dev/product/' + product.id} />
 		<meta name="description" content={product.desc} />
 		<meta property="og:title" content="{product.name} — ShopMate" />
 		<meta property="og:description" content={product.desc} />
 		<meta property="og:image" content={'https://shopmates.pages.dev' + product.src} />
 		<meta property="og:type" content="product" />
+		<meta property="og:url" content={'https://shopmates.pages.dev/product/' + product.id} />
 		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="{product.name} — ShopMate" />
+		<meta name="twitter:description" content={product.desc} />
+		<meta name="twitter:image" content={'https://shopmates.pages.dev' + product.src} />
 		{@html `<script type="application/ld+json">${jsonLd}</script>`}
+		{@html `<script type="application/ld+json">${breadcrumbLd}</script>`}
 	{/if}
 </svelte:head>
 
@@ -341,8 +448,13 @@
 						class="block aspect-square w-full cursor-zoom-in"
 					>
 						<img
-							src={images[activeImg] ?? product.src}
+							src={gallerySrc}
+							srcset={gallerySrcset}
+							sizes="(max-width: 1023px) 100vw, 50vw"
 							alt={product.name}
+							fetchpriority="high"
+							loading="eager"
+							decoding="async"
 							class="aspect-square w-full object-cover"
 						/>
 					</button>
@@ -389,7 +501,15 @@
 									? 'border-olive'
 									: 'border-line opacity-70 hover:opacity-100'}"
 							>
-								<img src={src} alt="" class="h-full w-full object-cover" />
+								<img
+									src={src}
+									srcset="{src.replace('.webp', '-400.webp')} 400w"
+									sizes="80px"
+									alt={i === 0 ? `${product.name} — main view` : `${product.name} — alternate view`}
+									loading="lazy"
+									decoding="async"
+									class="h-full w-full object-cover"
+								/>
 							</button>
 						{/each}
 					</div>
@@ -414,7 +534,7 @@
 
 				<p class="mt-4 flex flex-wrap items-baseline gap-3">
 					<span class="text-3xl font-extrabold text-ink">{formatPrice(product.price)}</span>
-					<span class="text-base text-stone-400 line-through"
+					<span class="text-base text-stone-500 line-through"
 						>{formatPrice(product.oldPrice)}</span
 					>
 					<span class="rounded-full bg-olive-soft px-2.5 py-1 text-xs font-bold text-olive">
@@ -473,7 +593,7 @@
 						{#if product.stock <= 15}
 							<span class="font-semibold text-amber-600">· Only {product.stock} left — order soon</span>
 						{:else}
-							<span class="text-stone-400">· {product.stock} available</span>
+							<span class="text-stone-500">· {product.stock} available</span>
 						{/if}
 					{:else}
 						<span class="h-2.5 w-2.5 rounded-full bg-red-500"></span>
@@ -632,12 +752,12 @@
 				<h2 class="text-lg font-extrabold tracking-tight text-ink">Frequently Bought Together</h2>
 				<div class="mt-4 flex flex-wrap items-center gap-3">
 					<a href="/product/{product.id}" class="block h-20 w-20 overflow-hidden rounded-xl bg-[#f6f1e7]">
-						<img src={product.src} alt={product.name} class="h-full w-full object-cover" />
+						<img src={product.src} srcset="{product.src.replace('.webp', '-400.webp')} 400w" sizes="80px" alt={product.name} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 					</a>
 					{#each fbtItems as item (item.id)}
 						<span class="text-xl font-bold text-stone-300" aria-hidden="true">+</span>
 						<a href="/product/{item.id}" class="block h-20 w-20 overflow-hidden rounded-xl bg-[#f6f1e7]">
-							<img src={item.src} alt={item.name} class="h-full w-full object-cover" />
+							<img src={item.src} srcset="{item.src.replace('.webp', '-400.webp')} 400w" sizes="80px" alt={item.name} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 						</a>
 					{/each}
 				</div>
@@ -750,7 +870,7 @@
 								</div>
 							{/each}
 						</div>
-						<p class="mt-3 text-[11px] text-stone-400">
+						<p class="mt-3 text-[11px] text-stone-500">
 							Breakdown from the {allReviews.length} reviews shown below.
 						</p>
 					</div>
@@ -785,7 +905,7 @@
 							{/each}
 						</div>
 						{#if sortedReviews.length === 0}
-							<p class="mt-6 rounded-xl bg-cream px-4 py-6 text-center text-sm text-stone-500">
+							<p class="mt-6 rounded-xl bg-cream px-4 py-6 text-center text-sm text-stone-600">
 								No {reviewFilter}★ reviews yet — try another rating or be the first to write one below.
 							</p>
 						{/if}
@@ -797,7 +917,7 @@
 										<span class="text-sm font-bold text-ink">{r.title}</span>
 									</p>
 									<p class="mt-1.5 text-sm leading-relaxed text-stone-600">{r.text}</p>
-									<p class="mt-1.5 text-xs text-stone-400">{r.name} · {r.date}</p>
+									<p class="mt-1.5 text-xs text-stone-500">{r.name} · {r.date}</p>
 									<button
 										type="button"
 										onclick={() => toggleHelpful(r)}
@@ -941,8 +1061,13 @@
 							<a href="/product/{item.id}" class="block aspect-square overflow-hidden bg-[#f6f1e7]">
 								<img
 									src={item.src}
+									srcset={item.src.includes('backpack') || item.src.includes('headphones')
+										? `${item.src.replace('.webp', '-400.webp')} 400w, ${item.src.replace('.webp', '-800.webp')} 800w, ${item.src.replace('.webp', '-1200.webp')} 1200w, ${item.src} 1600w`
+										: `${item.src.replace('.webp', '-400.webp')} 400w, ${item.src.replace('.webp', '-800.webp')} 800w, ${item.src} ${item.src.includes('lamp') || item.src.includes('tshirt') ? 1120 : 912}w`}
+									sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 300px"
 									alt={item.name}
 									loading="lazy"
+									decoding="async"
 									class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 								/>
 							</a>
@@ -968,8 +1093,13 @@
 								<a href="/product/{rel.id}" aria-label={rel.name} class="block h-full w-full">
 									<img
 										src={rel.src}
+										srcset={rel.src.includes('backpack') || rel.src.includes('headphones')
+											? `${rel.src.replace('.webp', '-400.webp')} 400w, ${rel.src.replace('.webp', '-800.webp')} 800w, ${rel.src.replace('.webp', '-1200.webp')} 1200w, ${rel.src} 1600w`
+											: `${rel.src.replace('.webp', '-400.webp')} 400w, ${rel.src.replace('.webp', '-800.webp')} 800w, ${rel.src} ${rel.src.includes('lamp') || rel.src.includes('tshirt') ? 1120 : 912}w`}
+										sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 300px"
 										alt={rel.name}
 										loading="lazy"
+										decoding="async"
 										class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 									/>
 								</a>
@@ -1011,7 +1141,7 @@
 								</p>
 								<p class="mt-2 flex items-baseline gap-2">
 									<span class="text-base font-extrabold text-ink">{formatPrice(rel.price)}</span>
-									<span class="text-xs text-stone-400 line-through"
+									<span class="text-xs text-stone-500 line-through"
 										>{formatPrice(rel.oldPrice)}</span
 									>
 								</p>
@@ -1034,12 +1164,12 @@
 	<div
 		class="fixed inset-x-0 bottom-14 z-40 flex items-center gap-3 border-t border-line bg-white/95 px-4 py-2.5 backdrop-blur lg:hidden"
 	>
-		<img src={product.src} alt="" class="h-10 w-10 rounded-lg object-cover" />
+		<img src={product.src} srcset="{product.src.replace('.webp', '-400.webp')} 400w" sizes="40px" alt={product.name} loading="lazy" decoding="async" class="h-10 w-10 rounded-lg object-cover" />
 		<div class="min-w-0 flex-1">
 			<p class="truncate text-xs font-semibold text-ink">{product.name}</p>
 			<p class="text-sm font-extrabold text-ink">
 				{formatPrice(product.price)}
-				<span class="ml-1 text-xs font-normal text-stone-400 line-through"
+				<span class="ml-1 text-xs font-normal text-stone-500 line-through"
 					>{formatPrice(product.oldPrice)}</span
 				>
 			</p>
@@ -1093,7 +1223,7 @@
 						{/each}
 					</tbody>
 				</table>
-				<p class="mt-4 text-xs text-stone-400">
+				<p class="mt-4 text-xs text-stone-500">
 					Still unsure? Free 30-day returns — if the fit is wrong, send it back.
 				</p>
 			</div>
@@ -1138,7 +1268,15 @@
 			{/if}
 			<img
 				src={images[activeImg] ?? product.src}
+				srcset={(images[activeImg] ?? product.src).includes('-2.webp')
+					? `${(images[activeImg] ?? product.src).replace('.webp', '-400.webp')} 400w, ${(images[activeImg] ?? product.src).replace('.webp', '-800.webp')} 800w, ${images[activeImg] ?? product.src} ${(images[activeImg] ?? product.src).includes('backpack') || (images[activeImg] ?? product.src).includes('headphones') || (images[activeImg] ?? product.src).includes('smartwatch') ? 912 : 800}w`
+					: (images[activeImg] ?? product.src).includes('backpack') || (images[activeImg] ?? product.src).includes('headphones')
+						? `${(images[activeImg] ?? product.src).replace('.webp', '-400.webp')} 400w, ${(images[activeImg] ?? product.src).replace('.webp', '-800.webp')} 800w, ${(images[activeImg] ?? product.src).replace('.webp', '-1200.webp')} 1200w, ${images[activeImg] ?? product.src} 1600w`
+						: `${(images[activeImg] ?? product.src).replace('.webp', '-400.webp')} 400w, ${(images[activeImg] ?? product.src).replace('.webp', '-800.webp')} 800w, ${images[activeImg] ?? product.src} ${(images[activeImg] ?? product.src).includes('lamp') || (images[activeImg] ?? product.src).includes('tshirt') ? 1120 : 912}w`}
+				sizes="100vw"
 				alt={product.name}
+				loading="eager"
+				decoding="async"
 				class="relative max-h-[85vh] max-w-full rounded-2xl object-contain shadow-2xl"
 			/>
 			<span class="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white">

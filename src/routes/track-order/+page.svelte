@@ -49,6 +49,11 @@
 
 <svelte:head>
 	<title>Track Order — ShopMate</title>
+	<meta
+		name="description"
+		content="Track your ShopMate order by ID (SMXXXXXXXX) or by email — see live status, estimated delivery and items, or cancel while it is Placed or Processing."
+	/>
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
@@ -81,13 +86,13 @@
 		</button>
 	</form>
 	{#if !submitted}
-		<p class="mt-2.5 flex items-start gap-1.5 text-xs text-stone-400">
+		<p class="mt-2.5 flex items-start gap-1.5 text-xs text-stone-500">
 			<Icon name="alert" class="mt-0.5 h-3.5 w-3.5 shrink-0" />
 			Your order ID looks like SMXXXXXXXX — you'll find it on the order confirmation page and in your order confirmation email.
 		</p>
 	{/if}
 
-	<div class="mt-5 flex items-center gap-3 text-xs font-semibold tracking-wide text-stone-400 uppercase">
+	<div class="mt-5 flex items-center gap-3 text-xs font-semibold tracking-wide text-stone-500 uppercase">
 		<span class="h-px flex-1 bg-line" aria-hidden="true"></span>
 		or track by email
 		<span class="h-px flex-1 bg-line" aria-hidden="true"></span>
@@ -185,21 +190,21 @@
 									? 'bg-olive text-white'
 									: i === step
 										? 'bg-olive text-white ring-4 ring-olive-soft'
-										: 'bg-stone-200 text-stone-400'}"
+										: 'bg-stone-200 text-stone-500'}"
 							>
 								{#if i < step}
 									<Icon name="check" class="h-4 w-4" />
 								{:else if i === step}
 									<span class="h-2.5 w-2.5 rounded-full bg-white"></span>
 								{:else}
-									<span class="h-2.5 w-2.5 rounded-full bg-stone-400"></span>
+									<span class="h-2.5 w-2.5 rounded-full bg-stone-500"></span>
 								{/if}
 							</span>
 							<span class="pt-1">
-								<span class="block text-sm font-semibold {i <= step ? 'text-ink' : 'text-stone-400'}">
+								<span class="block text-sm font-semibold {i <= step ? 'text-ink' : 'text-stone-500'}">
 									{label}
 								</span>
-								<span class="text-xs {i <= step ? 'text-stone-500' : 'text-stone-400'}">
+								<span class="text-xs text-stone-500">
 									{#if i < step}Completed
 									{:else if i === step}Current status
 									{:else}Pending{/if}
@@ -241,7 +246,7 @@
 							Cancel Order
 						</button>
 					{/if}
-					<p class="mt-2 text-xs text-stone-400">
+					<p class="mt-2 text-xs text-stone-500">
 						You can cancel while the order is Placed or Processing. Once it ships, use the 30-day returns process instead.
 					</p>
 				</div>
@@ -254,7 +259,7 @@
 					{#each found.items as item (item.id)}
 						<li class="flex items-center gap-3">
 							<a href="/product/{item.id}" class="block h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-[#f6f1e7]">
-								<img src={item.src} alt={item.name} class="h-full w-full object-cover" />
+								<img src={item.src} srcset="{item.src.replace('.webp', '-400.webp')} 400w" sizes="56px" alt={item.name} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 							</a>
 							<span class="min-w-0 flex-1">
 								<span class="block truncate text-sm font-semibold text-ink">{item.name}</span>

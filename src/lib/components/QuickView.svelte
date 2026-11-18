@@ -73,7 +73,17 @@
 
 			<div class="grid sm:grid-cols-2">
 				<div class="aspect-square overflow-hidden bg-[#f6f1e7] sm:rounded-l-3xl">
-					<img src={product.src} alt={product.name} class="h-full w-full object-cover" />
+					<img
+						src={product.src}
+						srcset={product.src.includes('backpack') || product.src.includes('headphones')
+							? `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src.replace('.webp', '-1200.webp')} 1200w, ${product.src} 1600w`
+							: `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src} ${product.src.includes('lamp') || product.src.includes('tshirt') ? 1120 : 912}w`}
+						sizes="(max-width: 640px) 100vw, 384px"
+						alt={product.name}
+						loading="lazy"
+						decoding="async"
+						class="h-full w-full object-cover"
+					/>
 				</div>
 
 				<div class="flex flex-col p-5 sm:p-6">
@@ -86,7 +96,7 @@
 					</p>
 					<p class="mt-3 flex items-baseline gap-2">
 						<span class="text-2xl font-extrabold text-ink">{formatPrice(product.price)}</span>
-						<span class="text-sm text-stone-400 line-through">{formatPrice(product.oldPrice)}</span>
+						<span class="text-sm text-stone-500 line-through">{formatPrice(product.oldPrice)}</span>
 						<span class="rounded-full bg-olive-soft px-2 py-0.5 text-xs font-bold text-olive">
 							{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% off
 						</span>

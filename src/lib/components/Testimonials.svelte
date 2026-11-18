@@ -34,7 +34,7 @@
 					{current.quote}
 				</blockquote>
 				<figcaption class="mt-5 flex items-center gap-3">
-					<img src={current.photo} alt={current.name} loading="lazy" class="h-10 w-10 rounded-full object-cover" />
+					<img src={current.photo} alt={current.name} loading="lazy" decoding="async" width="112" height="112" class="h-10 w-10 rounded-full object-cover" />
 					<span>
 						<span class="block text-sm font-semibold text-ink">{current.name}</span>
 						<Stars rating={5} />
@@ -61,7 +61,7 @@
 					<Icon name="quote" class="h-8 w-8 fill-olive text-olive" />
 					<blockquote class="mt-3 text-sm leading-relaxed text-stone-600">{t.quote}</blockquote>
 					<figcaption class="mt-5 flex items-center gap-3">
-						<img src={t.photo} alt={t.name} loading="lazy" class="h-10 w-10 rounded-full object-cover" />
+						<img src={t.photo} alt={t.name} loading="lazy" decoding="async" width="112" height="112" class="h-10 w-10 rounded-full object-cover" />
 						<span>
 							<span class="block text-sm font-semibold text-ink">{t.name}</span>
 							<Stars rating={5} />

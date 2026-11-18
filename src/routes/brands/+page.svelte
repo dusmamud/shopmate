@@ -28,6 +28,22 @@
 		name="description"
 		content="Browse ShopMate products by brand — Nova, Aural, Trekker, Stride, Elan, ThreadCo and Lumina."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/brands" />
+	<meta property="og:title" content="Shop by Brand — ShopMate" />
+	<meta
+		property="og:description"
+		content="Browse ShopMate products by brand — Nova, Aural, Trekker, Stride, Elan, ThreadCo and Lumina."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/brands" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Shop by Brand — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="Browse ShopMate products by brand — Nova, Aural, Trekker, Stride, Elan, ThreadCo and Lumina."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -50,8 +66,13 @@
 				<div class="relative aspect-[4/3] overflow-hidden bg-[#f6f1e7]">
 					<img
 						src={brand.photo}
+						srcset={brand.photo.includes('backpack') || brand.photo.includes('headphones')
+							? `${brand.photo.replace('.webp', '-400.webp')} 400w, ${brand.photo.replace('.webp', '-800.webp')} 800w, ${brand.photo.replace('.webp', '-1200.webp')} 1200w, ${brand.photo} 1600w`
+							: `${brand.photo.replace('.webp', '-400.webp')} 400w, ${brand.photo.replace('.webp', '-800.webp')} 800w, ${brand.photo} ${brand.photo.includes('lamp') || brand.photo.includes('tshirt') ? 1120 : 912}w`}
+						sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 300px"
 						alt="{brand.name} — {brand.first.name}"
 						loading="lazy"
+						decoding="async"
 						class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 					/>
 					<span

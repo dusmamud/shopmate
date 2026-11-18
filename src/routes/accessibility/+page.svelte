@@ -44,6 +44,22 @@
 		name="description"
 		content="ShopMate accessibility: keyboard-friendly navigation, screen-reader labels, reduced-motion support, and how to report a barrier."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/accessibility" />
+	<meta property="og:title" content="Accessibility — ShopMate" />
+	<meta
+		property="og:description"
+		content="ShopMate accessibility: keyboard-friendly navigation, screen-reader labels, reduced-motion support, and how to report a barrier."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/accessibility" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Accessibility — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate accessibility: keyboard-friendly navigation, screen-reader labels, reduced-motion support, and how to report a barrier."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">

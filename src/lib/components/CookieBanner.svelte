@@ -53,7 +53,7 @@
 					Decline
 				</button>
 			</div>
-			<p class="mt-2 text-xs text-stone-400">
+			<p class="mt-2 text-xs text-stone-500">
 				Read our
 				<a href="/privacy-policy" class="font-medium text-olive underline underline-offset-2">
 					Privacy Policy

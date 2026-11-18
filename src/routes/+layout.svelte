@@ -18,9 +18,37 @@
 	const orgJsonLd = JSON.stringify({
 		'@context': 'https://schema.org',
 		'@type': 'Organization',
+		'@id': 'https://shopmates.pages.dev/#organization',
 		name: 'ShopMate',
 		url: 'https://shopmates.pages.dev/',
-		sameAs: []
+		logo: 'https://shopmates.pages.dev/favicon.svg',
+		// Site-wide return policy (30-day easy returns, full refund — see
+		// /returns-policy). MerchantReturnLink form: the site states no
+		// shipping/return country, so no applicableCountry is invented.
+		hasMerchantReturnPolicy: {
+			'@type': 'MerchantReturnPolicy',
+			'@id': 'https://shopmates.pages.dev/#return-policy',
+			merchantReturnLink: 'https://shopmates.pages.dev/returns-policy',
+			returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+			merchantReturnDays: 30,
+			returnMethod: 'https://schema.org/ReturnByMail',
+			returnFees: 'https://schema.org/FreeReturn',
+			refundType: 'https://schema.org/FullRefund'
+		},
+		// Site-wide shipping (free over $50, otherwise $4.99 flat — see
+		// /shipping-policy). No destination: the site states no shipping country.
+		hasShippingService: [
+			{
+				'@type': 'ShippingService',
+				name: 'Free shipping over $50',
+				shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'USD' }
+			},
+			{
+				'@type': 'ShippingService',
+				name: 'Standard shipping',
+				shippingRate: { '@type': 'MonetaryAmount', value: 4.99, currency: 'USD' }
+			}
+		]
 	});
 
 	const messages = [
@@ -53,7 +81,13 @@
 
 <svelte:head>
 	<title>ShopMate — Discover The Best Products for You</title>
-	<meta property="og:type" content="website" />
+	<link
+		rel="preload"
+		href="/fonts/plus-jakarta-sans-var.woff2"
+		as="font"
+		type="font/woff2"
+		crossorigin
+	/>
 	<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 	{@html `<script type="application/ld+json">${orgJsonLd}</script>`}
 </svelte:head>

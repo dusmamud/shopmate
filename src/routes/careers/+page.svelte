@@ -90,11 +90,27 @@
 </script>
 
 <svelte:head>
-	<title>Careers — ShopMate</title>
+	<title>Careers at ShopMate — Join Our Team</title>
 	<meta
 		name="description"
 		content="Work at ShopMate — open roles in store management, customer support and the warehouse. Demo listings; applications are not really sent anywhere."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/careers" />
+	<meta property="og:title" content="Careers at ShopMate — Join Our Team" />
+	<meta
+		property="og:description"
+		content="Work at ShopMate — open roles in store management, customer support and the warehouse. Demo listings; applications are not really sent anywhere."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/careers" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Careers at ShopMate — Join Our Team" />
+	<meta
+		name="twitter:description"
+		content="Work at ShopMate — open roles in store management, customer support and the warehouse. Demo listings; applications are not really sent anywhere."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -217,7 +233,7 @@
 								Cancel
 							</button>
 						</div>
-						<p class="text-xs text-stone-400">Demo only — your details stay in this browser.</p>
+						<p class="text-xs text-stone-500">Demo only — your details stay in this browser.</p>
 					</form>
 				{:else}
 					<button
@@ -232,7 +248,7 @@
 		{/each}
 	</div>
 
-	<p class="mt-8 rounded-2xl border border-dashed border-line bg-cream px-6 py-5 text-center text-sm text-stone-500">
+	<p class="mt-8 rounded-2xl border border-dashed border-line bg-cream px-6 py-5 text-center text-sm text-stone-600">
 		Don't see a role for you? Write to
 		<a href="mailto:careers@shopmate.store" class="font-semibold text-olive hover:text-olive-dark"
 			>careers@shopmate.store</a

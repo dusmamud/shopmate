@@ -58,13 +58,22 @@
 		name="description"
 		content="ShopMate terms of service: a demo store — no real payments or fulfilment. Pricing in USD with taxes included, demo orders, promo codes, 30-day returns."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/terms" />
 	<meta property="og:title" content="Terms of Service — ShopMate" />
 	<meta
 		property="og:description"
-		content="ShopMate is a demo store: no real payments, no real fulfilment. Read the terms on pricing, orders, promo codes and returns."
+		content="ShopMate terms of service: a demo store — no real payments or fulfilment. Pricing in USD with taxes included, demo orders, promo codes, 30-day returns."
 	/>
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://shopmates.pages.dev/hero.webp" />
+	<meta property="og:url" content="https://shopmates.pages.dev/terms" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Terms of Service — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate terms of service: a demo store — no real payments or fulfilment. Pricing in USD with taxes included, demo orders, promo codes, 30-day returns."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">

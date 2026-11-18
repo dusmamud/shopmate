@@ -30,12 +30,13 @@
 <svelte:head>
 	<title>My Wishlist — ShopMate</title>
 	<meta name="description" content="Your saved ShopMate products — move them to your cart anytime. Free shipping over $50." />
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 	<Breadcrumbs items={[{ label: 'Wishlist' }]} />
 	<h1 class="mt-4 text-xl font-extrabold tracking-tight text-ink sm:text-2xl">
-		My Wishlist {#if saved.length > 0}<span class="text-stone-400">({saved.length})</span>{/if}
+		My Wishlist {#if saved.length > 0}<span class="text-stone-500">({saved.length})</span>{/if}
 	</h1>
 	<p class="mt-1 text-sm text-stone-500">Products you've saved for later. They stay on this device.</p>
 	{#if saved.length > 0}
@@ -69,8 +70,13 @@
 					<div class="relative aspect-square overflow-hidden bg-[#f6f1e7]">
 						<img
 							src={product.src}
+							srcset={product.src.includes('backpack') || product.src.includes('headphones')
+								? `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src.replace('.webp', '-1200.webp')} 1200w, ${product.src} 1600w`
+								: `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src} ${product.src.includes('lamp') || product.src.includes('tshirt') ? 1120 : 912}w`}
+							sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 240px"
 							alt={product.name}
 							loading="lazy"
+							decoding="async"
 							class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 						/>
 						{#if product.isNew}
@@ -97,7 +103,7 @@
 						</p>
 						<p class="mt-2 flex items-baseline gap-2">
 							<span class="text-base font-extrabold text-ink">{formatPrice(product.price)}</span>
-							<span class="text-xs text-stone-400 line-through">{formatPrice(product.oldPrice)}</span>
+							<span class="text-xs text-stone-500 line-through">{formatPrice(product.oldPrice)}</span>
 						</p>
 						<button
 							type="button"

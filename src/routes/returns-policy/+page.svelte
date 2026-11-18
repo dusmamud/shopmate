@@ -26,13 +26,22 @@
 		name="description"
 		content="ShopMate returns policy: 30-day easy returns on unused items in original packaging, refunds within 5–7 business days."
 	/>
-	<meta property="og:title" content="Returns & Refunds — ShopMate" />
+	<link rel="canonical" href="https://shopmates.pages.dev/returns-policy" />
+	<meta property="og:title" content="Returns &amp; Refunds — ShopMate" />
 	<meta
 		property="og:description"
-		content="30-day easy returns, no questions asked. Unused items in original packaging, refunded within 5–7 business days."
+		content="ShopMate returns policy: 30-day easy returns on unused items in original packaging, refunds within 5–7 business days."
 	/>
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://shopmates.pages.dev/hero.webp" />
+	<meta property="og:url" content="https://shopmates.pages.dev/returns-policy" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Returns &amp; Refunds — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate returns policy: 30-day easy returns on unused items in original packaging, refunds within 5–7 business days."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">

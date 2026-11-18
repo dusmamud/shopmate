@@ -82,6 +82,7 @@
 <svelte:head>
 	<title>Your Cart — ShopMate</title>
 	<meta name="description" content="Review your ShopMate cart — free shipping over $50, 30-day returns, secure checkout." />
+	<meta name="robots" content="noindex, follow" />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -126,7 +127,7 @@
 						{@const p = line.product!}
 						<li class="flex gap-4 p-4 sm:p-5">
 							<a href="/product/{p.id}" class="block h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-[#f6f1e7] sm:h-24 sm:w-24">
-								<img src={p.src} alt={p.name} class="h-full w-full object-cover" />
+								<img src={p.src} srcset="{p.src.replace('.webp', '-400.webp')} 400w" sizes="(max-width: 640px) 80px, 96px" alt={p.name} loading="lazy" decoding="async" class="h-full w-full object-cover" />
 							</a>
 							<div class="min-w-0 flex-1">
 								<div class="flex items-start justify-between gap-3">
@@ -253,7 +254,7 @@
 									<Icon name="alert" class="h-3.5 w-3.5" /> {promoError}
 								</p>
 							{:else}
-								<p class="mt-1.5 text-xs text-stone-400">Try WELCOME10 for 10% off or FREESHIP.</p>
+								<p class="mt-1.5 text-xs text-stone-500">Try WELCOME10 for 10% off or FREESHIP.</p>
 							{/if}
 						</form>
 					{/if}
@@ -302,7 +303,7 @@
 									<Icon name="alert" class="h-3.5 w-3.5" /> {giftError}
 								</p>
 							{:else}
-								<p class="mt-1.5 text-xs text-stone-400">Enter a gift card code from your account.</p>
+								<p class="mt-1.5 text-xs text-stone-500">Enter a gift card code from your account.</p>
 							{/if}
 						</form>
 					{/if}
@@ -351,7 +352,7 @@
 					>
 						Proceed to Checkout <Icon name="arrow-right" class="h-4 w-4" />
 					</button>
-					<p class="mt-3 flex items-center justify-center gap-1.5 text-xs text-stone-400">
+					<p class="mt-3 flex items-center justify-center gap-1.5 text-xs text-stone-500">
 						<Icon name="shield" class="h-3.5 w-3.5" /> Secure checkout · 30-day returns
 					</p>
 				</div>
@@ -368,8 +369,13 @@
 								<a href="/product/{product.id}" aria-label={product.name} class="block h-full w-full">
 									<img
 										src={product.src}
+										srcset={product.src.includes('backpack') || product.src.includes('headphones')
+											? `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src.replace('.webp', '-1200.webp')} 1200w, ${product.src} 1600w`
+											: `${product.src.replace('.webp', '-400.webp')} 400w, ${product.src.replace('.webp', '-800.webp')} 800w, ${product.src} ${product.src.includes('lamp') || product.src.includes('tshirt') ? 1120 : 912}w`}
+										sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 300px"
 										alt={product.name}
 										loading="lazy"
+										decoding="async"
 										class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 									/>
 								</a>
@@ -385,7 +391,7 @@
 								</h3>
 								<p class="mt-2 flex items-baseline gap-2">
 									<span class="text-base font-extrabold text-ink">{formatPrice(product.price)}</span>
-									<span class="text-xs text-stone-400 line-through">{formatPrice(product.oldPrice)}</span>
+									<span class="text-xs text-stone-500 line-through">{formatPrice(product.oldPrice)}</span>
 								</p>
 								<button
 									type="button"

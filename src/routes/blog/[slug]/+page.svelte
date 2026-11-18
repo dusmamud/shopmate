@@ -5,16 +5,82 @@
 
 	const post = $derived(getPost(page.params.slug ?? ''));
 	const related = $derived(post ? relatedPosts(post.slug) : []);
+
+	/** ISO publication dates (from blog.ts display dates: Nov 10 / Nov 5 / Oct 28, 2026). */
+	const datePublishedBySlug: Record<string, string> = {
+		'choose-right-running-shoes': '2026-11-10',
+		'wireless-headphones-buying-guide': '2026-11-05',
+		'capsule-wardrobe-beginners-guide': '2026-10-28'
+	};
+
+	/** Short display titles used in <title>/og:title/twitter:title (post.title stays the headline). */
+	const displayTitleBySlug: Record<string, string> = {
+		'wireless-headphones-buying-guide': 'Wireless Headphones Buying Guide',
+		'capsule-wardrobe-beginners-guide': 'Capsule Wardrobe Guide for Beginners'
+	};
+
+	/** One relevant existing product image per post, with the real price from products.ts. */
+	const figureBySlug: Record<string, { src: string; alt: string; caption: string }> = {
+		'choose-right-running-shoes': {
+			src: '/product-shoes-800.webp',
+			alt: 'Running Shoes',
+			caption: 'Running Shoes — $49.99 at ShopMate'
+		},
+		'wireless-headphones-buying-guide': {
+			src: '/product-headphones-800.webp',
+			alt: 'Wireless Headphones',
+			caption: 'Wireless Headphones — $59.99 at ShopMate'
+		},
+		'capsule-wardrobe-beginners-guide': {
+			src: '/product-tshirt-800.webp',
+			alt: 'Classic Cotton T-Shirt',
+			caption: 'Classic Cotton T-Shirt — $19.99 at ShopMate'
+		}
+	};
+
+	const displayTitle = $derived(
+		post ? (displayTitleBySlug[post.slug] ?? post.title) : ''
+	);
+	const datePublished = $derived(post ? (datePublishedBySlug[post.slug] ?? '') : '');
+	const figure = $derived(post ? figureBySlug[post.slug] : undefined);
+	const postUrl = $derived(post ? 'https://shopmates.pages.dev/blog/' + post.slug : '');
+
+	const blogJsonLd = $derived(
+		post && figure
+			? JSON.stringify({
+					'@context': 'https://schema.org',
+					'@type': 'BlogPosting',
+					headline: post.title,
+					datePublished,
+					author: {
+						'@type': 'Organization',
+						'@id': 'https://shopmates.pages.dev/#organization',
+						name: 'ShopMate'
+					},
+					image: 'https://shopmates.pages.dev' + figure.src,
+					mainEntityOfPage: postUrl,
+					description: post.excerpt
+				})
+			: ''
+	);
 </script>
 
 <svelte:head>
-	<title>{post ? `${post.title} — ShopMate Blog` : 'Post not found — ShopMate Blog'}</title>
-	{#if post}
+	<title>{post ? `${displayTitle} — ShopMate Blog` : 'Post not found — ShopMate Blog'}</title>
+	{#if post && figure}
+		<link rel="canonical" href={postUrl} />
 		<meta name="description" content={post.excerpt} />
-		<meta property="og:title" content="{post.title} — ShopMate Blog" />
+		<meta property="og:title" content="{displayTitle} — ShopMate Blog" />
 		<meta property="og:description" content={post.excerpt} />
 		<meta property="og:type" content="article" />
-		<meta property="og:image" content="https://shopmates.pages.dev/hero.webp" />
+		<meta property="og:url" content={postUrl} />
+		<meta property="og:image" content={'https://shopmates.pages.dev' + figure.src} />
+		<meta property="article:published_time" content={datePublished} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="{displayTitle} — ShopMate Blog" />
+		<meta name="twitter:description" content={post.excerpt} />
+		<meta name="twitter:image" content={'https://shopmates.pages.dev' + figure.src} />
+		{@html `<script type="application/ld+json">${blogJsonLd}</script>`}
 	{/if}
 </svelte:head>
 
@@ -49,8 +115,23 @@
 		</p>
 
 		<div class="mt-8 space-y-5">
-			{#each post.body as para (para.slice(0, 48))}
+			{#each post.body as para, i (para.slice(0, 48))}
 				<p class="text-base leading-relaxed text-stone-700">{para}</p>
+				{#if i === 0 && figure}
+					<figure>
+						<img
+							src={figure.src}
+							srcset="{figure.src.replace('-800.webp', '-400.webp')} 400w, {figure.src} 800w"
+							sizes="(max-width: 768px) 100vw, 768px"
+							width="800"
+							height="800"
+							loading="lazy"
+							alt={figure.alt}
+							class="w-full rounded-2xl object-cover"
+						/>
+						<figcaption class="mt-2 text-sm text-stone-500">{figure.caption}</figcaption>
+					</figure>
+				{/if}
 			{/each}
 		</div>
 
@@ -78,7 +159,7 @@
 							href="/blog/{rel.slug}"
 							class="group rounded-2xl border border-line bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition hover:-translate-y-0.5 hover:shadow-lg"
 						>
-							<p class="text-xs font-medium text-stone-400">{rel.date} · {rel.minutes} min read</p>
+							<p class="text-xs font-medium text-stone-500">{rel.date} · {rel.minutes} min read</p>
 							<h3 class="mt-2 text-base leading-snug font-bold text-ink group-hover:text-olive">
 								{rel.title}
 							</h3>

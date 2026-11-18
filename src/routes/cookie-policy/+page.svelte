@@ -37,6 +37,22 @@
 		name="description"
 		content="ShopMate cookie policy: no tracking cookies. Only small on-device storage (localStorage) for your cart, wishlist and preferences — nothing sent to a server."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/cookie-policy" />
+	<meta property="og:title" content="Cookie Policy — ShopMate" />
+	<meta
+		property="og:description"
+		content="ShopMate cookie policy: no tracking cookies. Only small on-device storage (localStorage) for your cart, wishlist and preferences — nothing sent to a server."
+	/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://shopmates.pages.dev/cookie-policy" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Cookie Policy — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate cookie policy: no tracking cookies. Only small on-device storage (localStorage) for your cart, wishlist and preferences — nothing sent to a server."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">

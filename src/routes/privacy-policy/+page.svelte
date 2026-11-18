@@ -43,13 +43,22 @@
 		name="description"
 		content="ShopMate privacy policy: your account, cart and orders are stored only in your browser (localStorage). No tracking, no servers, no payment details stored."
 	/>
+	<link rel="canonical" href="https://shopmates.pages.dev/privacy-policy" />
 	<meta property="og:title" content="Privacy Policy — ShopMate" />
 	<meta
 		property="og:description"
-		content="Your data stays on your device. ShopMate stores accounts, carts and orders only in your browser's localStorage — nothing is sent to a server."
+		content="ShopMate privacy policy: your account, cart and orders are stored only in your browser (localStorage). No tracking, no servers, no payment details stored."
 	/>
 	<meta property="og:type" content="website" />
-	<meta property="og:image" content="https://shopmates.pages.dev/hero.webp" />
+	<meta property="og:url" content="https://shopmates.pages.dev/privacy-policy" />
+	<meta property="og:image" content="https://shopmates.pages.dev/og-image.webp" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Privacy Policy — ShopMate" />
+	<meta
+		name="twitter:description"
+		content="ShopMate privacy policy: your account, cart and orders are stored only in your browser (localStorage). No tracking, no servers, no payment details stored."
+	/>
+	<meta name="twitter:image" content="https://shopmates.pages.dev/og-image.webp" />
 </svelte:head>
 
 <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
