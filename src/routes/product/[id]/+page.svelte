@@ -60,31 +60,22 @@
 						priceCurrency: 'USD',
 						price: product.price,
 						availability: 'https://schema.org/InStock',
+						// Product-level shipping: Google's merchant-listing subset
+						// for OfferShippingDetails is ONLY deliveryTime +
+						// shippingDestination + shippingRate (MonetaryAmount) —
+						// it has NO threshold property. The old
+						// eligibleTransactionVolume is not a property of
+						// OfferShippingDetails in schema.org (nor in Google's
+						// docs) and validator.schema.org flags it, so it is
+						// removed. The free-over-$50 threshold therefore lives
+						// ONLY at org level (Organization.hasShippingService
+						// -> ShippingConditions.orderValue minValue 50), which
+						// is Google's designed home for it since Nov 2025. A
+						// bare $0 rate here would falsely promise free shipping
+						// on every order, so the product level states just the
+						// standard $4.99 rate. No shippingDestination: the site
+						// states no shipping country — none is invented.
 						shippingDetails: [
-							{
-								'@type': 'OfferShippingDetails',
-								shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'USD' },
-								eligibleTransactionVolume: {
-									'@type': 'PriceSpecification',
-									priceCurrency: 'USD',
-									minPrice: 50
-								},
-								deliveryTime: {
-									'@type': 'ShippingDeliveryTime',
-									handlingTime: {
-										'@type': 'QuantitativeValue',
-										minValue: 0,
-										maxValue: 1,
-										unitCode: 'DAY'
-									},
-									transitTime: {
-										'@type': 'QuantitativeValue',
-										minValue: 2,
-										maxValue: 3,
-										unitCode: 'DAY'
-									}
-								}
-							},
 							{
 								'@type': 'OfferShippingDetails',
 								shippingRate: { '@type': 'MonetaryAmount', value: 4.99, currency: 'USD' },
@@ -591,7 +582,7 @@
 						<span class="h-2.5 w-2.5 rounded-full bg-green-500"></span>
 						<span class="text-green-700">In stock</span>
 						{#if product.stock <= 15}
-							<span class="font-semibold text-amber-600">· Only {product.stock} left — order soon</span>
+							<span class="font-semibold text-amber-700">· Only {product.stock} left — order soon</span>
 						{:else}
 							<span class="text-stone-500">· {product.stock} available</span>
 						{/if}

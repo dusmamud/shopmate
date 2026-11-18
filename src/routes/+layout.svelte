@@ -35,20 +35,56 @@
 			returnFees: 'https://schema.org/FreeReturn',
 			refundType: 'https://schema.org/FullRefund'
 		},
-		// Site-wide shipping (free over $50, otherwise $4.99 flat — see
-		// /shipping-policy). No destination: the site states no shipping country.
-		hasShippingService: [
-			{
-				'@type': 'ShippingService',
-				name: 'Free shipping over $50',
-				shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'USD' }
+		// Site-wide shipping (free over $50, otherwise $4.99 flat; delivery
+		// 3-4 business days — see /shipping-policy). Shape per Google's
+		// Merchant Shipping Policy docs (developers.google.com/search/docs/
+		// appearance/structured-data/shipping-policy): ONE ShippingService
+		// whose REQUIRED shippingConditions are ShippingConditions objects
+		// (orderValue range + shippingRate + transitTime). shippingRate is
+		// NOT a property of ShippingService itself, so it lives only inside
+		// shippingConditions. No shippingDestination: the site states no
+		// shipping country, and Google applies destination-less conditions
+		// worldwide — none is invented.
+		hasShippingService: {
+			'@type': 'ShippingService',
+			name: 'Standard shipping',
+			description:
+				'Free shipping on orders of $50 or more, otherwise a flat $4.99 fee. Delivery in 3–4 business days.',
+			handlingTime: {
+				'@type': 'ServicePeriod',
+				duration: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' }
 			},
-			{
-				'@type': 'ShippingService',
-				name: 'Standard shipping',
-				shippingRate: { '@type': 'MonetaryAmount', value: 4.99, currency: 'USD' }
-			}
-		]
+			shippingConditions: [
+				{
+					'@type': 'ShippingConditions',
+					orderValue: { '@type': 'MonetaryAmount', minValue: 50, currency: 'USD' },
+					shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'USD' },
+					transitTime: {
+						'@type': 'ServicePeriod',
+						duration: {
+							'@type': 'QuantitativeValue',
+							minValue: 2,
+							maxValue: 3,
+							unitCode: 'DAY'
+						}
+					}
+				},
+				{
+					'@type': 'ShippingConditions',
+					orderValue: { '@type': 'MonetaryAmount', minValue: 0, maxValue: 49.99, currency: 'USD' },
+					shippingRate: { '@type': 'MonetaryAmount', value: 4.99, currency: 'USD' },
+					transitTime: {
+						'@type': 'ServicePeriod',
+						duration: {
+							'@type': 'QuantitativeValue',
+							minValue: 2,
+							maxValue: 3,
+							unitCode: 'DAY'
+						}
+					}
+				}
+			]
+		}
 	});
 
 	const messages = [
